@@ -1,0 +1,185 @@
+<!-- ══════════════════════════════════════════════════════════════════════
+     TEXTURA SINCRONIZADA — painel do módulo
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="ts">
+
+  <!-- ═════════ HEADER / HERO ═════════ -->
+  <section class="ts__hero">
+    <div class="ts__hero-text">
+      <div class="section-header__label-row">
+        <span class="section-header__label">TEXTURA SINCRONIZADA</span>
+        <div class="section-header__divider"></div>
+      </div>
+      <h2 class="ts__hero-title">Uma imagem, várias faces.</h2>
+      <p class="ts__hero-subtitle">
+        Selecione as faces da fachada, carregue uma imagem e posicione como se fosse um único quadro
+        gigante atrás de todas elas. O ACMFacil calcula as coordenadas UV em coordenadas mundiais
+        e garante a continuidade perfeita.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═════════ ETAPAS (3 passos) ═════════ -->
+  <section class="ts__steps">
+    <div class="ts__step">
+      <div class="ts__step-num">1</div>
+      <div class="ts__step-content">
+        <h3 class="ts__step-title">Capture as faces</h3>
+        <p class="ts__step-desc">Selecione 1 ou mais faces (ou grupos) no SketchUp e clique abaixo.</p>
+      </div>
+    </div>
+    <div class="ts__step">
+      <div class="ts__step-num">2</div>
+      <div class="ts__step-content">
+        <h3 class="ts__step-title">Carregue a imagem</h3>
+        <p class="ts__step-desc">PNG, JPG ou BMP de qualquer resolução.</p>
+      </div>
+    </div>
+    <div class="ts__step">
+      <div class="ts__step-num">3</div>
+      <div class="ts__step-content">
+        <h3 class="ts__step-title">Posicione e aplique</h3>
+        <p class="ts__step-desc">Arraste, escale e rotacione no preview — depois clique Aplicar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ ACTION BAR (3 botões principais) ═════════ -->
+  <section class="ts__actions">
+    <button type="button" class="btn btn--primary btn--lg" id="ts_btn_capturar">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+      <span>Capturar seleção</span>
+    </button>
+
+    <button type="button" class="btn btn--secondary btn--lg" id="ts_btn_carregar" disabled>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+      <span>Carregar imagem</span>
+    </button>
+
+    <button type="button" class="btn btn--gold btn--lg" id="ts_btn_aplicar" disabled>
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+      <span>Aplicar textura</span>
+    </button>
+  </section>
+
+  <!-- ═════════ STATUS BAR ═════════ -->
+  <section class="ts__status" id="ts_status" hidden>
+    <div class="ts__status-item">
+      <span class="ts__status-label">Faces:</span>
+      <span class="ts__status-value" id="ts_status_faces">0</span>
+    </div>
+    <div class="ts__status-item">
+      <span class="ts__status-label">Plano:</span>
+      <span class="ts__status-value" id="ts_status_plane">—</span>
+    </div>
+    <div class="ts__status-item">
+      <span class="ts__status-label">Dimensões (mm):</span>
+      <span class="ts__status-value" id="ts_status_dims">—</span>
+    </div>
+    <div class="ts__status-item">
+      <span class="ts__status-label">Imagem:</span>
+      <span class="ts__status-value" id="ts_status_image">—</span>
+    </div>
+  </section>
+
+  <!-- ═════════ WORK AREA (Canvas + Controls) ═════════ -->
+  <section class="ts__workspace" id="ts_workspace" hidden>
+
+    <!-- Canvas -->
+    <div class="ts__canvas-wrap">
+      <div class="ts__canvas-toolbar">
+        <span class="ts__canvas-title">Preview 2D</span>
+        <div class="ts__canvas-toolbar-actions">
+          <button type="button" class="btn btn--ghost btn--sm" id="ts_btn_fit" title="Ajustar à viewport">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+            Ajustar
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm" id="ts_btn_center_texture" title="Centralizar no bbox das faces">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>
+            Centralizar
+          </button>
+          <button type="button" class="btn btn--ghost btn--sm" id="ts_btn_reset_texture" title="Resetar posição/escala/rotação">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset
+          </button>
+        </div>
+      </div>
+      <canvas id="ts_canvas" class="ts__canvas" width="800" height="500"></canvas>
+      <div class="ts__canvas-hint">
+        <strong>Dicas:</strong> arraste o retângulo pra mover · alças nos cantos pra escalar ·
+        alça no topo pra rotacionar · <strong>scroll</strong> = zoom ·
+        <strong>clique no scroll</strong> = pan · <strong>Shift + clique no scroll</strong> = pan fino
+      </div>
+    </div>
+
+    <!-- Numeric inputs (ajuste fino) -->
+    <aside class="ts__sidebar">
+      <div class="ts__control-group">
+        <h4 class="ts__control-title">Posição (mm)</h4>
+        <div class="ts__control-row">
+          <div class="ts__control">
+            <label>Centro X</label>
+            <input type="number" step="1" id="ts_input_x" value="0">
+          </div>
+          <div class="ts__control">
+            <label>Centro Y</label>
+            <input type="number" step="1" id="ts_input_y" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="ts__control-group">
+        <div class="ts__control-group-header">
+          <h4 class="ts__control-title">Dimensões (mm)</h4>
+          <button type="button" class="ts__lock-btn is-locked" id="ts_lock_ratio" title="Travar proporção da imagem">
+            <svg class="ts__lock-icon ts__lock-icon--closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <svg class="ts__lock-icon ts__lock-icon--open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+            <span class="ts__lock-label">Proporção</span>
+          </button>
+        </div>
+        <div class="ts__control-row">
+          <div class="ts__control">
+            <label>Largura</label>
+            <input type="number" step="1" min="1" id="ts_input_w" value="1000">
+          </div>
+          <div class="ts__control">
+            <label>Altura</label>
+            <input type="number" step="1" min="1" id="ts_input_h" value="1000">
+          </div>
+        </div>
+      </div>
+
+      <div class="ts__control-group">
+        <h4 class="ts__control-title">Rotação</h4>
+        <div class="ts__control">
+          <label>Ângulo (graus)</label>
+          <input type="range" min="-180" max="180" step="1" value="0" id="ts_input_rot_slider">
+          <input type="number" step="1" min="-360" max="360" id="ts_input_rot" value="0">
+        </div>
+      </div>
+
+      <div class="ts__control-group ts__control-group--info">
+        <h4 class="ts__control-title">Info</h4>
+        <div class="ts__info-row">
+          <span>Imagem original:</span>
+          <span id="ts_info_img_size">—</span>
+        </div>
+        <div class="ts__info-row">
+          <span>BBox das faces:</span>
+          <span id="ts_info_bbox">—</span>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <!-- Empty state (antes da captura) -->
+  <section class="ts__empty" id="ts_empty">
+    <div class="ts__empty-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+    </div>
+    <h3>Nada capturado ainda</h3>
+    <p>Selecione faces no SketchUp e clique em <strong>Capturar seleção</strong>.</p>
+  </section>
+
+</div>

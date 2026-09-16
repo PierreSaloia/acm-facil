@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>ACMFacil — Desenho Geométrico</title>
+<link rel="stylesheet" href="geoart.css">
+</head>
+<body>
+  <div class="ga">
+    <header class="ga__head">
+      <h1 class="ga__title" data-key="titulo">Desenho Geométrico</h1>
+      <p class="ga__sub" data-key="subtitulo">Foto → mosaico low-poly em ACM (quadro geométrico).</p>
+    </header>
+
+    <div class="ga__scroll">
+      <!-- IMAGEM -->
+      <div class="ga__section">
+        <span class="ga__label" data-key="secImagem">1 · IMAGEM</span>
+        <button type="button" class="ga__btn ga__btn--sec" id="ga_btn_carregar">
+          <span data-key="btnCarregar">Carregar foto (JPG/PNG)</span>
+        </button>
+        <div class="ga__filename" id="ga_filename" hidden></div>
+        <div class="ga__preview-wrap" id="ga_img_wrap" hidden>
+          <img id="ga_img" alt="">
+        </div>
+      </div>
+
+      <!-- GEOMÉTRICO -->
+      <div class="ga__section">
+        <span class="ga__label" data-key="secGeo">2 · GEOMÉTRICO</span>
+        <div class="ga__grid">
+          <div class="ga__field">
+            <label data-key="pontos">Densidade (triângulos)</label>
+            <input id="ga_pontos" type="range" min="80" max="1200" step="20" value="350">
+            <span class="ga__val" id="ga_pontos_val">350</span>
+          </div>
+          <div class="ga__field ga__field--check">
+            <label><input id="ga_fundo" type="checkbox" checked> <span data-key="removerFundo">Remover fundo (cor dos cantos)</span></label>
+          </div>
+          <div class="ga__field" id="ga_f_tol">
+            <label data-key="tol">Tolerância do fundo</label>
+            <input id="ga_tol" type="range" min="10" max="120" step="5" value="40">
+            <span class="ga__val" id="ga_tol_val">40</span>
+          </div>
+        </div>
+        <button type="button" class="ga__btn ga__btn--sec" id="ga_btn_processar" disabled>
+          <span data-key="btnProcessar">Processar (gerar o geométrico)</span>
+        </button>
+        <div class="ga__preview-wrap" id="ga_mosaic_wrap" hidden>
+          <canvas id="ga_canvas"></canvas>
+          <div class="ga__hint" id="ga_tris_info"></div>
+        </div>
+      </div>
+
+      <!-- SAÍDA -->
+      <div class="ga__section">
+        <span class="ga__label" data-key="secSaida">3 · SAÍDA (ACM)</span>
+        <div class="ga__grid ga__grid--3">
+          <div class="ga__field">
+            <label data-key="largura">Largura final (mm)</label>
+            <input id="ga_larg" type="number" value="600" min="100" step="10">
+          </div>
+          <div class="ga__field">
+            <label data-key="espessura">Espessura ACM (mm)</label>
+            <input id="ga_esp" type="number" value="3" min="1" step="0.5">
+          </div>
+          <div class="ga__field">
+            <label data-key="folga">Junta entre peças (mm)</label>
+            <input id="ga_folga" type="number" value="2" min="0" step="0.5">
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D COM IA -->
+      <div class="ga__section">
+        <span class="ga__label" data-key="sec3d">4 · 3D COM IA (BETA)</span>
+        <p class="ga__hint" data-key="hint3d">Gera o objeto 3D inteiro a partir da foto (leva 1–3 min).</p>
+        <div class="ga__grid">
+          <div class="ga__field">
+            <label data-key="faces3d">Triângulos do 3D</label>
+            <input id="ga_faces" type="range" min="100" max="1500" step="50" value="500">
+            <span class="ga__val" id="ga_faces_val">500</span>
+          </div>
+        </div>
+        <button type="button" class="ga__btn ga__btn--sec" id="ga_btn_3d" disabled>
+          <span data-key="btn3d">Gerar 3D com IA</span>
+        </button>
+        <div class="ga__preview-wrap" id="ga_3d_wrap" hidden>
+          <canvas id="ga_canvas3d"></canvas>
+          <div class="ga__hint" id="ga_3d_info"></div>
+        </div>
+        <button type="button" class="ga__btn ga__btn--pri" id="ga_btn_3d_su" disabled hidden>
+          <span data-key="btn3dSu">Gerar sólido 3D no SketchUp</span>
+        </button>
+      </div>
+    </div>
+
+    <footer class="ga__foot">
+      <div class="ga__msg" id="ga_msg" hidden></div>
+      <button type="button" class="ga__btn ga__btn--pri" id="ga_btn_gerar" disabled>
+        <span data-key="btnGerar">Gerar mosaico 3D</span>
+      </button>
+    </footer>
+  </div>
+
+  <script src="../../js/bridge.js"></script>
+  <script src="geoart.js"></script>
+</body>
+</html>

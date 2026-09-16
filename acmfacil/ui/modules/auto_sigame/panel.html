@@ -1,0 +1,368 @@
+<!-- ══════════════════════════════════════════════════════════════════════
+     AUTO SIGAM-ME — painel do módulo (Auto-ACM + follow-me)
+     Mesmos controles/visual do Auto-ACM; sem captura/preview/plano.
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="asg">
+
+  <!-- ═════════ HERO ═════════ -->
+  <section class="asg__hero">
+    <div class="section-header__label-row">
+      <span class="section-header__label" data-i18n="asg.label">AUTO SIGAM-ME</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <h2 class="asg__hero-title" data-i18n="asg.hero.title">ACM que segue o caminho da fachada.</h2>
+    <p class="asg__hero-subtitle" data-i18n="asg.hero.subtitle">
+      Defina altura, profundidade e as configurações do ACM. Depois clique em
+      <strong>Desenhar caminho</strong> e marque os pontos na fachada — o ACM acompanha
+      todo o trajeto, dobrando nos cantos.
+    </p>
+  </section>
+
+  <!-- ═════════ FAIXA (altura + profundidade) ═════════ -->
+  <section class="asg__section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.faixa">Faixa</h3>
+      <p class="asg__section-desc" data-i18n="asg.sec.faixa_desc">O comprimento vem do caminho desenhado. Profundidade pequena vira testeira; grande vira caixa.</p>
+    </div>
+    <div class="asg__form-grid asg__form-grid--2">
+      <div class="field">
+        <label class="field__label" for="asg_altura" data-i18n="asg.f.altura">Altura</label>
+        <div class="asg__number">
+          <input type="number" id="asg_altura" value="600" min="10" step="10">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="asg_prof" data-i18n="asg.f.prof">Profundidade</label>
+        <div class="asg__number">
+          <input type="number" id="asg_prof" value="40" min="5" step="5">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ PRÉ-VISUALIZAÇÃO (após gerar) ═════════ -->
+  <section class="asg__section" id="asg_preview_section" hidden>
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.preview">Pré-visualização</h3>
+      <p class="asg__section-desc" data-i18n="asg.preview.desc">Gerada a partir do caminho desenhado. Planta de cima e vista isométrica.</p>
+    </div>
+    <div class="asg__canvas-wrap">
+      <div class="asg__canvas-toolbar">
+        <span class="asg__canvas-title" data-i18n="asg.caminho.planta">Planta de cima</span>
+        <button type="button" class="btn btn--ghost btn--sm" id="asg_path_fit" data-i18n="asg.caminho.fit">Ajustar</button>
+      </div>
+      <canvas id="asg_canvas2d" class="asg__canvas2d"></canvas>
+      <div class="asg__canvas-hint" data-i18n="asg.caminho.hint">A faixa segue o caminho · scroll = zoom · marcas claras = emendas das chapas.</div>
+    </div>
+    <div class="asg__canvas-wrap asg__canvas-wrap--iso">
+      <div class="asg__canvas-toolbar">
+        <span class="asg__canvas-title" data-i18n="asg.preview.iso">Isométrico</span>
+        <button type="button" class="btn btn--ghost btn--sm" id="asg_iso_fit" data-i18n="asg.caminho.fit">Ajustar</button>
+      </div>
+      <canvas id="asg_canvas3d" class="asg__canvas2d"></canvas>
+      <div class="asg__canvas-hint" data-i18n="asg.preview.iso_hint">Arraste = orbitar · scroll = zoom.</div>
+    </div>
+  </section>
+
+  <!-- ═════════ PLANO DE CORTE (após gerar — clonado do Auto-ACM) ═════════ -->
+  <section class="asg__section" id="asg_plano_section" hidden>
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="aa.plano.title">Plano de corte</h3>
+      <p class="asg__section-desc" data-i18n="aa.plano.desc">Documento imprimível com as vistas, lista de peças e quantitativo. Abre num navegador pra você imprimir ou salvar como PDF.</p>
+    </div>
+    <div class="asg__plano-actions">
+      <button class="btn btn--secondary btn--lg" id="asg_btn_plano" onclick="AutoSigame.gerarPlano()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span data-i18n="aa.plano.btn">Exportar plano de corte</span>
+      </button>
+    </div>
+    <p class="asg__status" id="asg_plano_status" hidden></p>
+  </section>
+
+  <!-- ═════════ FACES A REVESTIR ═════════ -->
+  <section class="asg__section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.faces">Faces a revestir</h3>
+      <p class="asg__section-desc" data-i18n="asg.faces.desc">Frontal projeta pra fora; traseira fica contra a parede. Esq./Dir. são os caps das pontas livres do caminho.</p>
+    </div>
+    <div class="asg__face-checks">
+      <label class="asg__face-check">
+        <input type="checkbox" id="asg_enab_frontal" checked>
+        <span class="asg__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1"/></svg></span>
+        <span class="asg__face-check-label" data-i18n="asg.face.frontal">Frontal</span>
+      </label>
+      <label class="asg__face-check">
+        <input type="checkbox" id="asg_enab_traseira">
+        <span class="asg__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1" stroke-dasharray="2 2"/></svg></span>
+        <span class="asg__face-check-label" data-i18n="asg.face.traseira">Traseira</span>
+      </label>
+      <label class="asg__face-check">
+        <input type="checkbox" id="asg_enab_topo" checked>
+        <span class="asg__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L20 8 L20 16 L4 16 Z"/><line x1="4" y1="8" x2="20" y2="8" stroke-width="2.5"/></svg></span>
+        <span class="asg__face-check-label" data-i18n="asg.face.topo">Topo</span>
+      </label>
+      <label class="asg__face-check">
+        <input type="checkbox" id="asg_enab_base" checked>
+        <span class="asg__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L20 8 L20 16 L4 16 Z"/><line x1="4" y1="16" x2="20" y2="16" stroke-width="2.5"/></svg></span>
+        <span class="asg__face-check-label" data-i18n="asg.face.base">Base</span>
+      </label>
+      <label class="asg__face-check">
+        <input type="checkbox" id="asg_enab_esq">
+        <span class="asg__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L8 20 L16 20 L16 4 Z"/><line x1="8" y1="4" x2="8" y2="20" stroke-width="2.5"/></svg></span>
+        <span class="asg__face-check-label" data-i18n="asg.face.esq">Cap esquerdo</span>
+      </label>
+      <label class="asg__face-check">
+        <input type="checkbox" id="asg_enab_dir">
+        <span class="asg__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L8 20 L16 20 L16 4 Z"/><line x1="16" y1="4" x2="16" y2="20" stroke-width="2.5"/></svg></span>
+        <span class="asg__face-check-label" data-i18n="asg.face.dir">Cap direito</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- ═════════ ACM ═════════ -->
+  <section class="asg__section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.acm">ACM</h3>
+      <p class="asg__section-desc" data-i18n="asg.acm.desc">Espessura, tipo de chapa, orientação e cor do revestimento.</p>
+    </div>
+
+    <div class="asg__form-grid asg__form-grid--3">
+      <div class="field">
+        <label class="field__label" for="asg_acm_esp" data-i18n="asg.f.esp">Espessura</label>
+        <div class="asg__select-wrap">
+          <select class="asg__select" id="asg_acm_esp">
+            <option value="3" selected>3 mm</option>
+            <option value="4">4 mm</option>
+            <option value="5">5 mm</option>
+          </select>
+          <svg class="asg__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="asg_chapa_preset" data-i18n="asg.acm.chapa_size">Tamanho da chapa</label>
+        <div class="asg__select-wrap">
+          <select class="asg__select" id="asg_chapa_preset">
+            <option value="5000x1220" selected>5000 × 1220 mm (BR)</option>
+            <option value="5000x1500">5000 × 1500 mm (BR grande)</option>
+            <option value="2440x1220">2440 × 1220 mm (US/EU 8'×4')</option>
+            <option value="3200x1500">3200 × 1500 mm (EU grande)</option>
+            <option value="custom" data-i18n="asg.acm.chapa_custom">Customizado…</option>
+          </select>
+          <svg class="asg__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" data-i18n="asg.f.orient">Orientação</label>
+        <div class="asg__pills" role="radiogroup">
+          <button type="button" class="asg__pill is-active" data-val="horizontal">
+            <span data-i18n="asg.opt.horizontal">Horizontal</span>
+          </button>
+          <button type="button" class="asg__pill" data-val="vertical">
+            <span data-i18n="asg.opt.vertical">Vertical</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="asg__form-grid asg__form-grid--2" id="asg_chapa_custom_wrap" hidden style="margin-top:var(--space-3)">
+      <div class="field">
+        <label class="field__label" for="asg_chapa_comp" data-i18n="asg.acm.chapa_comp">Comprimento</label>
+        <div class="asg__number">
+          <input type="number" id="asg_chapa_comp" value="5000" min="500" max="20000" step="10">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="asg_chapa_larg" data-i18n="asg.acm.chapa_larg">Largura</label>
+        <div class="asg__number">
+          <input type="number" id="asg_chapa_larg" value="1220" min="300" max="3000" step="10">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="asg__color">
+      <div class="asg__color-header">
+        <span class="field__label" data-i18n="asg.acm.color">Cor do ACM</span>
+        <div class="asg__color-selected">
+          <div class="asg__color-preview" id="asg_color_preview"></div>
+          <span class="asg__color-name" id="asg_color_name" data-i18n="asg.acm.color.empty">Selecione uma cor</span>
+        </div>
+      </div>
+      <div class="asg__color-tabs" id="asg_color_tabs"></div>
+      <div class="asg__color-grid" id="asg_color_grid"></div>
+    </div>
+  </section>
+
+  <!-- ═════════ JUNTAS ═════════ -->
+  <section class="asg__section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.junta">Juntas</h3>
+      <p class="asg__section-desc" data-i18n="asg.junta.desc">Tipo de junta entre as chapas e a cor visível.</p>
+    </div>
+
+    <div class="asg__form-grid asg__form-grid--2">
+      <div class="field">
+        <label class="field__label" data-i18n="asg.junta.type">Tipo</label>
+        <div class="asg__pills" role="radiogroup">
+          <button type="button" class="asg__pill is-active" data-jt="seca"><span data-i18n="asg.opt.seca">Seca</span></button>
+          <button type="button" class="asg__pill" data-jt="dilatacao"><span data-i18n="asg.opt.dilatacao">Dilatação</span></button>
+        </div>
+      </div>
+      <div class="field" id="asg_junta_mm_wrap" hidden>
+        <label class="field__label" for="asg_junta_mm" data-i18n="asg.junta.mm">Folga</label>
+        <div class="asg__number">
+          <input type="number" id="asg_junta_mm" value="8" min="3" max="20" step="1">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="asg__color-compact">
+      <span class="field__label" data-i18n="asg.junta.color">Cor da junta</span>
+      <div class="asg__junta-swatches" id="asg_junta_swatches"></div>
+    </div>
+  </section>
+
+  <!-- ═════════ EMENDAS ═════════ -->
+  <section class="asg__section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.emenda">Emendas</h3>
+      <p class="asg__section-desc" data-i18n="asg.emenda.desc">Perfil que une chapas em trechos maiores que a chapa.</p>
+    </div>
+    <div class="asg__form-grid asg__form-grid--2">
+      <div class="field">
+        <label class="field__label" for="asg_emenda_w" data-i18n="asg.emenda.w">Largura</label>
+        <div class="asg__number">
+          <input type="number" id="asg_emenda_w" value="30" min="20" step="5">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="asg_emenda_h" data-i18n="asg.emenda.h">Altura</label>
+        <div class="asg__number">
+          <input type="number" id="asg_emenda_h" value="20" min="15" step="5">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field__label" data-i18n="asg.emenda.align">Alinhamento</label>
+      <div class="asg__pills asg__pills--4" role="radiogroup">
+        <button type="button" class="asg__pill is-active" data-align="esquerda">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10,18 4,12 10,6"/></svg>
+          <span data-i18n="asg.opt.esquerda">Esq.</span>
+        </button>
+        <button type="button" class="asg__pill" data-align="central">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="8,6 4,12 8,18"/><polyline points="16,6 20,12 16,18"/></svg>
+          <span data-i18n="asg.opt.central">Centro</span>
+        </button>
+        <button type="button" class="asg__pill" data-align="direita">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14,6 20,12 14,18"/></svg>
+          <span data-i18n="asg.opt.direita">Dir.</span>
+        </button>
+        <button type="button" class="asg__pill" data-align="simetrica">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="5" height="8"/><rect x="10" y="8" width="5" height="8"/><rect x="17" y="8" width="4" height="8"/></svg>
+          <span data-i18n="asg.opt.simetrica">Sim.</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ FITA DUPLA-FACE ═════════ -->
+  <section class="asg__section" id="asg_fita_section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.fita">Fita dupla-face</h3>
+      <p class="asg__section-desc" data-i18n="asg.fita.desc">Fita adesiva que fixa o ACM na estrutura metálica.</p>
+    </div>
+    <label class="asg__toggle">
+      <input type="checkbox" id="asg_fita_inc" checked>
+      <span class="asg__toggle-track"><span class="asg__toggle-thumb"></span></span>
+      <span class="asg__toggle-label" data-i18n="asg.fita.include">Incluir fita dupla-face</span>
+    </label>
+    <div class="asg__form-grid asg__form-grid--2" id="asg_fita_config">
+      <div class="field">
+        <label class="field__label" for="asg_fita_larg" data-i18n="asg.fita.larg">Largura</label>
+        <div class="asg__select-wrap">
+          <select class="asg__select" id="asg_fita_larg">
+            <option value="12" selected>12 mm</option>
+            <option value="19">19 mm</option>
+            <option value="25">25 mm</option>
+            <option value="50">50 mm</option>
+          </select>
+          <svg class="asg__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="asg_fita_esp" data-i18n="asg.fita.esp">Espessura</label>
+        <div class="asg__select-wrap">
+          <select class="asg__select" id="asg_fita_esp">
+            <option value="0.5">0.5 mm</option>
+            <option value="0.9" selected>0.9 mm</option>
+            <option value="1.2">1.2 mm</option>
+            <option value="1.6">1.6 mm</option>
+          </select>
+          <svg class="asg__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ METALON ═════════ -->
+  <section class="asg__section">
+    <div class="asg__section-header">
+      <h3 class="asg__section-title" data-i18n="asg.sec.metalon">Estrutura Metalon</h3>
+      <p class="asg__section-desc" data-i18n="asg.metalon.desc">Perfil de metalon que forma a estrutura por trás do ACM.</p>
+    </div>
+    <div class="asg__form-grid asg__form-grid--2">
+      <div class="field">
+        <label class="field__label" for="asg_met_w" data-i18n="asg.metalon.w">Largura</label>
+        <div class="asg__number">
+          <input type="number" id="asg_met_w" value="20" min="20" step="5">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="asg_met_h" data-i18n="asg.metalon.h">Altura</label>
+        <div class="asg__number">
+          <input type="number" id="asg_met_h" value="20" min="20" step="5">
+          <span class="asg__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ AÇÃO ═════════ -->
+  <section class="asg__section asg__gerar-section">
+    <div class="asg__gerar">
+      <div class="asg__gerar-info">
+        <h3 class="asg__gerar-title" data-i18n="asg.gerar.title">Pronto pra desenhar?</h3>
+        <p class="asg__gerar-desc" data-i18n="asg.gerar.desc">Ative a ferramenta e marque os pontos do caminho na fachada. O ACM segue o trajeto.</p>
+      </div>
+      <div class="asg__gerar-buttons">
+        <button class="btn btn--lg asg__gerar-btn" id="asg_btn_desenhar">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>
+          <span data-i18n="asg.btn.desenhar">Desenhar caminho</span>
+        </button>
+      </div>
+    </div>
+    <p class="asg__status" id="asg_status"></p>
+    <p class="asg__hint" data-i18n="asg.hint">
+      Depois de clicar, vá ao SketchUp e marque os pontos. Shift trava em 45°, Enter (ou
+      duplo-clique) gera, Esc cancela. O ponto clicado é o canto inferior de trás — o volume
+      projeta pra frente.
+    </p>
+  </section>
+
+</div>

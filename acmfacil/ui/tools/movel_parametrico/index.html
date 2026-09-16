@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ACMFacil — Móvel Paramétrico</title>
+  <link rel="stylesheet" href="../../css/tokens.css">
+  <link rel="stylesheet" href="../../css/base.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="movel_parametrico.css">
+</head>
+<body>
+  <div class="mp">
+
+    <header class="mp__header">
+      <h1 class="mp__title" data-key="title">Móvel Paramétrico</h1>
+      <p class="mp__subtitle" data-key="subtitle">Fatia um sólido em chapas paralelas com fixação.</p>
+    </header>
+
+    <div class="mp__editing" id="mp_editing" hidden>
+      <span id="mp_editing_txt"></span>
+      <button class="btn btn--ghost btn--sm" id="mp_btn_novo" data-key="novo">Novo</button>
+    </div>
+
+    <div class="mp__scroll">
+
+      <!-- BLOCO DE ORIGEM -->
+      <div class="mp__section">
+        <span class="mp__label" data-key="secBloco">BLOCO DE ORIGEM</span>
+        <p class="mp__hint" data-key="hintBloco">Modele o volume como sólido(s) fechado(s) — pode ser UMA peça ou uma logo inteira com várias peças separadas (grupos/componentes). Selecione tudo e clique Gerar: as fatias saem alinhadas no conjunto. Os originais ficam ocultos e são reaproveitados ao regenerar.</p>
+      </div>
+
+      <!-- VISTA 2D: FATIAMENTO -->
+      <div class="mp__section">
+        <span class="mp__label" data-key="secDiagFat">VISTA 2D — FATIAMENTO (COTAS)</span>
+        <div class="mp__diagram" id="mp_diag_fat"></div>
+      </div>
+
+      <!-- FATIAMENTO -->
+      <div class="mp__section">
+        <span class="mp__label" data-key="secFat">FATIAMENTO</span>
+        <div class="mp__grid">
+          <div class="mp__field">
+            <label data-key="chapa">Espessura da chapa (mm)</label>
+            <input id="mp_chapa" type="number" value="15" min="3" step="1">
+          </div>
+          <div class="mp__field">
+            <label data-key="gap">Vão entre fatias (mm)</label>
+            <input id="mp_gap" type="number" value="30" min="0" step="1">
+          </div>
+          <div class="mp__field">
+            <label data-key="eixo">Direção das fatias</label>
+            <select id="mp_eixo">
+              <option value="x" selected data-key="eixoX">Verticais na largura (eixo X)</option>
+              <option value="y" data-key="eixoY">Verticais na profundidade (eixo Y)</option>
+              <option value="z" data-key="eixoZ">Horizontais empilhadas (eixo Z)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA 2D: FIXAÇÃO -->
+      <div class="mp__section">
+        <span class="mp__label" data-key="secDiagFix">VISTA 2D — FIXAÇÃO (COTAS)</span>
+        <div class="mp__diagram" id="mp_diag_fix"></div>
+      </div>
+
+      <!-- FIXAÇÃO -->
+      <div class="mp__section">
+        <span class="mp__label" data-key="secFix">FIXAÇÃO</span>
+        <div class="mp__grid">
+          <div class="mp__field">
+            <label data-key="fixTipo">Tipo de fixação</label>
+            <select id="mp_fix_tipo">
+              <option value="barra" selected data-key="fixBarra">Barra roscada + porcas</option>
+              <option value="tubo" data-key="fixTubo">Tubo/cano metálico</option>
+              <option value="cavilha" data-key="fixCavilha">Cavilha de madeira</option>
+              <option value="ripa" data-key="fixRipa">Ripa/sarrafo encaixado</option>
+              <option value="nenhuma" data-key="fixNenhuma">Sem fixação</option>
+            </select>
+          </div>
+          <div class="mp__field">
+            <label data-key="fixQtd">Quantidade mínima</label>
+            <input id="mp_fix_qtd" type="number" value="2" min="1" max="30" step="1">
+          </div>
+          <div class="mp__field" id="mp_wrap_diam">
+            <label data-key="fixDiam">Diâmetro (mm)</label>
+            <input id="mp_fix_diam" type="number" value="10" min="3" step="1">
+          </div>
+          <div class="mp__field" id="mp_wrap_duplo">
+            <label data-key="fixDuplo">Par de fixadores</label>
+            <select id="mp_fix_duplo">
+              <option value="vertical" selected data-key="duploVert">Duplo vertical (em cima + embaixo)</option>
+              <option value="horizontal" data-key="duploHoriz">Duplo horizontal (lado a lado)</option>
+            </select>
+          </div>
+          <div class="mp__field">
+            <label data-key="fixFolga">Folga do furo/rasgo (mm)</label>
+            <input id="mp_fix_folga" type="number" value="0.5" min="0" step="0.1">
+          </div>
+          <div class="mp__field" id="mp_wrap_ripa_larg" hidden>
+            <label data-key="ripaLarg">Ripa: profundidade (mm)</label>
+            <input id="mp_ripa_larg" type="number" value="40" min="10" step="1">
+          </div>
+          <div class="mp__field" id="mp_wrap_ripa_esp" hidden>
+            <label data-key="ripaEsp">Ripa: espessura (mm)</label>
+            <input id="mp_ripa_esp" type="number" value="6" min="3" step="0.5">
+          </div>
+          <div class="mp__field">
+            <label data-key="fixLado">Lado da fixação</label>
+            <select id="mp_fix_lado">
+              <option value="tras" selected data-key="ladoTras">Traseira</option>
+              <option value="frente" data-key="ladoFrente">Frente</option>
+              <option value="cima" data-key="ladoCima">Cima</option>
+              <option value="baixo" data-key="ladoBaixo">Baixo</option>
+              <option value="centro" data-key="ladoCentro">Centro</option>
+            </select>
+          </div>
+          <div class="mp__field">
+            <label data-key="fixMargem">Margem da borda (mm)</label>
+            <input id="mp_fix_margem" type="number" value="50" min="5" step="5">
+          </div>
+        </div>
+      </div>
+
+      <!-- COR -->
+      <div class="mp__section">
+        <span class="mp__label" data-key="secCor">COR / ACABAMENTO DAS FATIAS</span>
+        <div class="mp__cor">
+          <div class="mp__cor-head">
+            <span class="mp__cor-chip" id="mp_cor_chip"></span>
+            <span class="mp__cor-nome" id="mp_cor_nome"></span>
+          </div>
+          <div class="mp__cor-tabs" id="mp_cor_tabs"></div>
+          <div class="mp__cor-grid" id="mp_cor_grid"></div>
+        </div>
+      </div>
+
+    </div><!-- /scroll -->
+
+    <p class="mp__msg" id="mp_msg"></p>
+
+    <footer class="mp__footer">
+      <button class="btn btn--secondary" id="mp_btn_carregar" data-key="carregar">Carregar selecionado</button>
+      <button class="btn btn--primary" id="mp_btn_gerar" data-key="gerar">Gerar</button>
+    </footer>
+
+  </div>
+
+  <script src="../../js/bridge.js"></script>
+  <script src="movel_parametrico.js"></script>
+</body>
+</html>

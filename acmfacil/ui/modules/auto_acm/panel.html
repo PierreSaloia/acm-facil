@@ -1,0 +1,851 @@
+<!-- ══════════════════════════════════════════════════════════════════════
+     AUTO-ACM — painel do módulo (FASE 1: captura de faces)
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="aa">
+
+  <!-- ═════════ HEADER / HERO ═════════ -->
+  <section class="aa__hero">
+    <div class="aa__hero-text">
+      <div class="section-header__label-row">
+        <span class="section-header__label" data-i18n="aa.kicker">MODO REVERSO</span>
+        <div class="section-header__divider"></div>
+      </div>
+      <h2 class="aa__hero-title" data-i18n="aa.title">Gerador Auto-ACM</h2>
+      <p class="aa__hero-subtitle" data-i18n="aa.subtitle">
+        Crie a caixa, selecione e capture. O ACMFacil preenche com toda a estrutura.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═════════ ETAPAS (3 passos) ═════════ -->
+  <section class="aa__steps">
+    <div class="aa__step">
+      <div class="aa__step-num">1</div>
+      <div class="aa__step-content">
+        <h3 class="aa__step-title" data-i18n="aa.step1.title">Crie e agrupe</h3>
+        <p class="aa__step-desc" data-i18n="aa.step1.desc">Desenhe uma caixa no SketchUp e agrupe com a tecla G.</p>
+      </div>
+    </div>
+    <div class="aa__step">
+      <div class="aa__step-num">2</div>
+      <div class="aa__step-content">
+        <h3 class="aa__step-title" data-i18n="aa.step2.title">Capture as faces</h3>
+        <p class="aa__step-desc" data-i18n="aa.step2.desc">Selecione 1 ou mais grupos (Ctrl+click) e clique no botão abaixo.</p>
+      </div>
+    </div>
+    <div class="aa__step">
+      <div class="aa__step-num">3</div>
+      <div class="aa__step-content">
+        <h3 class="aa__step-title" data-i18n="aa.step3.title">Configure e gere</h3>
+        <p class="aa__step-desc" data-i18n="aa.step3.desc">Defina acabamentos, visualize o preview e gere a estrutura completa.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ BOTÃO PRINCIPAL DE CAPTURA ═════════ -->
+  <section class="aa__capture">
+    <button class="btn btn--primary btn--lg btn--block aa__capture-btn" id="aa_btn_capturar" onclick="AutoAcm.capturarFaces()">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <line x1="3" y1="9" x2="21" y2="9"/>
+        <line x1="9" y1="21" x2="9" y2="9"/>
+        <circle cx="15" cy="15" r="2" fill="currentColor"/>
+      </svg>
+      <span data-i18n="aa.capture.btn">Capturar faces dos grupos selecionados</span>
+    </button>
+    <div class="aa__capture-hint">
+      <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span data-i18n="aa.capture.hint">Para multi-módulo, selecione todos os grupos antes de clicar (Ctrl+click).</span>
+    </div>
+    <button class="btn btn--ghost btn--sm aa__create-box-btn" id="aa_btn_criar_caixa" onclick="AutoAcm.criarCaixaParam()">
+      <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span data-i18n="aa.capture.create">Criar caixa paramétrica…</span>
+    </button>
+  </section>
+
+  <!-- ═════════ TABS DE MÓDULOS (visível quando ≥ 2) ═════════ -->
+  <section class="aa__tabs" id="aa_tabs_wrap" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label" id="aa_tabs_label" data-i18n="aa.tabs.label">MÓDULOS CAPTURADOS</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aa__tabs-row" id="aa_tabs"></div>
+  </section>
+
+  <!-- ═════════ CAIXA DETECTADA ═════════ -->
+  <section class="aa__box-info" id="aa_box_info" hidden>
+    <div class="aa__box-info-header">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <div>
+        <div class="aa__box-info-label" data-i18n="aa.box.label">Caixa detectada</div>
+        <div class="aa__box-info-dim" id="aa_dim">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ MAPEAMENTO DE FACES ═════════ -->
+  <section class="aa__section" id="aa_face_map_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.faces.title">Mapeamento das faces</h3>
+      <p class="aa__section-desc" data-i18n="aa.faces.desc">Defina qual papel (frontal, topo, etc.) cada cor representa.</p>
+    </div>
+    <div class="aa__face-map" id="aa_face_map"></div>
+  </section>
+
+  <!-- ═════════ FACES A REVESTIR ═════════ -->
+  <section class="aa__section" id="aa_enab_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.enab.title">Faces a revestir</h3>
+      <p class="aa__section-desc" data-i18n="aa.enab.desc">Marque quais faces do módulo vão receber o revestimento em ACM.</p>
+    </div>
+    <div class="aa__face-checks">
+      <label class="aa__face-check">
+        <input type="checkbox" id="aa_enab_frontal" checked>
+        <span class="aa__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1"/></svg></span>
+        <span class="aa__face-check-label" data-i18n="aa.role.frontal">Frontal</span>
+      </label>
+      <label class="aa__face-check">
+        <input type="checkbox" id="aa_enab_traseira">
+        <span class="aa__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1" stroke-dasharray="2 2"/></svg></span>
+        <span class="aa__face-check-label" data-i18n="aa.role.traseira">Traseira</span>
+      </label>
+      <label class="aa__face-check">
+        <input type="checkbox" id="aa_enab_topo" checked>
+        <span class="aa__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L20 8 L20 16 L4 16 Z"/><line x1="4" y1="8" x2="20" y2="8" stroke-width="2.5"/></svg></span>
+        <span class="aa__face-check-label" data-i18n="aa.role.topo">Topo</span>
+      </label>
+      <label class="aa__face-check">
+        <input type="checkbox" id="aa_enab_base" checked>
+        <span class="aa__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L20 8 L20 16 L4 16 Z"/><line x1="4" y1="16" x2="20" y2="16" stroke-width="2.5"/></svg></span>
+        <span class="aa__face-check-label" data-i18n="aa.role.base">Base</span>
+      </label>
+      <label class="aa__face-check">
+        <input type="checkbox" id="aa_enab_esq" checked>
+        <span class="aa__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L8 20 L16 20 L16 4 Z"/><line x1="8" y1="4" x2="8" y2="20" stroke-width="2.5"/></svg></span>
+        <span class="aa__face-check-label" data-i18n="aa.role.esq">Lateral esquerda</span>
+      </label>
+      <label class="aa__face-check">
+        <input type="checkbox" id="aa_enab_dir" checked>
+        <span class="aa__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L8 20 L16 20 L16 4 Z"/><line x1="16" y1="4" x2="16" y2="20" stroke-width="2.5"/></svg></span>
+        <span class="aa__face-check-label" data-i18n="aa.role.dir">Lateral direita</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- ═════════ ACM (material + cor) ═════════ -->
+  <section class="aa__section" id="aa_acm_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.acm.title">ACM</h3>
+      <p class="aa__section-desc" data-i18n="aa.acm.desc">Espessura, tipo de chapa e cor do revestimento.</p>
+    </div>
+
+    <div class="aa__form-grid aa__form-grid--3">
+      <div class="field">
+        <label class="field__label" for="aa_acm_esp" data-i18n="aa.acm.esp">Espessura</label>
+        <div class="aa__select-wrap">
+          <select class="aa__select" id="aa_acm_esp">
+            <option value="3" selected>3 mm</option>
+            <option value="4">4 mm</option>
+            <option value="5">5 mm</option>
+          </select>
+          <svg class="aa__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="aa_chapa_preset" data-i18n="aa.acm.chapa_size">Tamanho da chapa</label>
+        <div class="aa__select-wrap">
+          <select class="aa__select" id="aa_chapa_preset" onchange="AutoAcm.onChapaPresetChange()">
+            <option value="5000x1220" selected data-i18n="aa.acm.chapa_preset.br_5000_1220">5000 × 1220 mm (BR)</option>
+            <option value="5000x1500" data-i18n="aa.acm.chapa_preset.br_5000_1500">5000 × 1500 mm (BR grande)</option>
+            <option value="2440x1220" data-i18n="aa.acm.chapa_preset.us_2440_1220">2440 × 1220 mm (US/EU 8'×4')</option>
+            <option value="3200x1500" data-i18n="aa.acm.chapa_preset.eu_3200_1500">3200 × 1500 mm (EU grande)</option>
+            <option value="custom" data-i18n="aa.acm.chapa_preset.custom">Customizado…</option>
+          </select>
+          <svg class="aa__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <!-- Compatibilidade com código antigo: este input recebe a largura derivada do preset -->
+        <input type="hidden" id="aa_acm_chapa" value="1220">
+      </div>
+
+      <div class="field">
+        <label class="field__label" data-i18n="aa.acm.orient">Orientação</label>
+        <div class="aa__pills" role="radiogroup">
+          <button type="button" class="aa__pill is-active" data-val="horizontal" onclick="AutoAcm.setOrient('horizontal')">
+            <span data-i18n="aa.acm.orient.h">Horizontal</span>
+          </button>
+          <button type="button" class="aa__pill" data-val="vertical" onclick="AutoAcm.setOrient('vertical')">
+            <span data-i18n="aa.acm.orient.v">Vertical</span>
+          </button>
+        </div>
+        <div class="aa__orient-hint" id="aa_orient_hint" hidden></div>
+      </div>
+    </div>
+
+    <!-- Inputs custom: aparecem só quando preset = customizado -->
+    <div class="aa__form-grid aa__form-grid--2" id="aa_chapa_custom_wrap" hidden style="margin-top:var(--space-3)">
+      <div class="field">
+        <label class="field__label" for="aa_chapa_comp_custom" data-i18n="aa.acm.chapa_custom.comp">Comprimento (mm)</label>
+        <div class="aa__number">
+          <input type="number" id="aa_chapa_comp_custom" value="5000" min="500" max="20000" step="10" oninput="AutoAcm.onChapaCustomChange()">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="aa_chapa_larg_custom" data-i18n="aa.acm.chapa_custom.larg">Largura (mm)</label>
+        <div class="aa__number">
+          <input type="number" id="aa_chapa_larg_custom" value="1220" min="300" max="3000" step="10" oninput="AutoAcm.onChapaCustomChange()">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="aa__color">
+      <div class="aa__color-header">
+        <span class="field__label" data-i18n="aa.acm.color">Cor do ACM</span>
+        <div class="aa__color-selected">
+          <div class="aa__color-preview" id="aa_color_preview"></div>
+          <span class="aa__color-name" id="aa_color_name" data-i18n="aa.acm.color.empty">Selecione uma cor</span>
+        </div>
+      </div>
+      <div class="aa__color-tabs" id="aa_color_tabs"></div>
+      <div class="aa__color-grid" id="aa_color_grid"></div>
+    </div>
+  </section>
+
+  <!-- ═════════ JUNTAS ═════════ -->
+  <section class="aa__section" id="aa_junta_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.junta.title">Juntas</h3>
+      <p class="aa__section-desc" data-i18n="aa.junta.desc">Tipo de junta entre as chapas de ACM e a cor visível.</p>
+    </div>
+
+    <div class="aa__form-grid aa__form-grid--2">
+      <div class="field">
+        <label class="field__label" data-i18n="aa.junta.type">Tipo</label>
+        <div class="aa__pills" role="radiogroup">
+          <button type="button" class="aa__pill is-active" data-jt="seca" onclick="AutoAcm.setJuntaTipo('seca')">
+            <span data-i18n="aa.junta.seca">Seca</span>
+          </button>
+          <button type="button" class="aa__pill" data-jt="dilatacao" onclick="AutoAcm.setJuntaTipo('dilatacao')">
+            <span data-i18n="aa.junta.dilatacao">Dilatação</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field" id="aa_junta_mm_wrap" hidden>
+        <label class="field__label" for="aa_junta_mm" data-i18n="aa.junta.mm">Folga (mm)</label>
+        <div class="aa__number">
+          <input type="number" id="aa_junta_mm" value="8" min="3" max="20" step="1">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="aa__color-compact">
+      <span class="field__label" data-i18n="aa.junta.color">Cor da junta</span>
+      <div class="aa__junta-swatches" id="aa_junta_swatches"></div>
+    </div>
+  </section>
+
+  <!-- ═════════ EMENDAS ═════════ -->
+  <section class="aa__section" id="aa_emenda_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.emenda.title">Emendas</h3>
+      <p class="aa__section-desc" data-i18n="aa.emenda.desc">Perfil usado para unir chapas em faces maiores que 5 metros.</p>
+    </div>
+
+    <div class="aa__form-grid aa__form-grid--2">
+      <div class="field">
+        <label class="field__label" for="aa_emenda_w" data-i18n="aa.emenda.w">Largura</label>
+        <div class="aa__number">
+          <input type="number" id="aa_emenda_w" value="30" min="20" step="5">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="aa_emenda_h" data-i18n="aa.emenda.h">Altura</label>
+        <div class="aa__number">
+          <input type="number" id="aa_emenda_h" value="20" min="15" step="5">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field__label" data-i18n="aa.emenda.align">Alinhamento</label>
+      <div class="aa__pills aa__pills--4" role="radiogroup">
+        <button type="button" class="aa__pill is-active" data-align="esquerda" onclick="AutoAcm.setEmendaAlign('esquerda')" data-i18n-title="aa.emenda.align.esq.tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="20" y1="12" x2="4" y2="12"/><polyline points="10,18 4,12 10,6"/></svg>
+          <span data-i18n="aa.emenda.align.esq">Esq.</span>
+        </button>
+        <button type="button" class="aa__pill" data-align="central" onclick="AutoAcm.setEmendaAlign('central')" data-i18n-title="aa.emenda.align.cen.tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="8,6 4,12 8,18"/><polyline points="16,6 20,12 16,18"/></svg>
+          <span data-i18n="aa.emenda.align.cen">Centro</span>
+        </button>
+        <button type="button" class="aa__pill" data-align="direita" onclick="AutoAcm.setEmendaAlign('direita')" data-i18n-title="aa.emenda.align.dir.tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><polyline points="14,6 20,12 14,18"/></svg>
+          <span data-i18n="aa.emenda.align.dir">Dir.</span>
+        </button>
+        <button type="button" class="aa__pill" data-align="simetrica" onclick="AutoAcm.setEmendaAlign('simetrica')" data-i18n-title="aa.emenda.align.sim.tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="5" height="8"/><rect x="10" y="8" width="5" height="8"/><rect x="17" y="8" width="4" height="8"/></svg>
+          <span data-i18n="aa.emenda.align.sim">Sim.</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ FITA DUPLA-FACE ═════════ -->
+  <section class="aa__section" id="aa_fita_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.fita.title">Fita dupla-face</h3>
+      <p class="aa__section-desc" data-i18n="aa.fita.desc">Fita adesiva que fixa o ACM na estrutura metálica.</p>
+    </div>
+
+    <label class="aa__toggle">
+      <input type="checkbox" id="aa_fita_inc" checked onchange="AutoAcm.toggleFita()">
+      <span class="aa__toggle-track">
+        <span class="aa__toggle-thumb"></span>
+      </span>
+      <span class="aa__toggle-label" data-i18n="aa.fita.include">Incluir fita dupla-face</span>
+    </label>
+
+    <div class="aa__form-grid aa__form-grid--2" id="aa_fita_config">
+      <div class="field">
+        <label class="field__label" for="aa_fita_larg" data-i18n="aa.fita.larg">Largura</label>
+        <div class="aa__select-wrap">
+          <select class="aa__select" id="aa_fita_larg">
+            <option value="12" selected>12 mm</option>
+            <option value="19">19 mm</option>
+            <option value="25">25 mm</option>
+            <option value="50">50 mm</option>
+          </select>
+          <svg class="aa__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="aa_fita_esp" data-i18n="aa.fita.esp">Espessura</label>
+        <div class="aa__fita-esp-row">
+          <div class="aa__select-wrap">
+            <select class="aa__select" id="aa_fita_esp">
+              <option value="0.5">0.5 mm</option>
+              <option value="0.9" selected>0.9 mm</option>
+              <option value="1.2">1.2 mm</option>
+              <option value="1.6">1.6 mm</option>
+            </select>
+            <svg class="aa__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <button type="button" class="aa__fita-esp-add" id="aa_fita_esp_add" onclick="AutoAcm.addFitaEsp()" title="Salvar nova espessura" data-i18n-title="aa.fita.esp.add">+</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ METALON (estrutura) ═════════ -->
+  <section class="aa__section" id="aa_metalon_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.metalon.title">Estrutura Metalon</h3>
+      <p class="aa__section-desc" data-i18n="aa.metalon.desc">Perfil de metalon que forma a estrutura por trás do ACM.</p>
+    </div>
+    <div class="aa__form-grid aa__form-grid--2">
+      <div class="field">
+        <label class="field__label" for="aa_met_w" data-i18n="aa.metalon.w">Largura</label>
+        <div class="aa__number">
+          <input type="number" id="aa_met_w" value="20" min="20" step="5">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="aa_met_h" data-i18n="aa.metalon.h">Altura</label>
+        <div class="aa__number">
+          <input type="number" id="aa_met_h" value="20" min="20" step="5">
+          <span class="aa__number-unit">mm</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ SPOTS / ILUMINAÇÃO ═════════ -->
+  <section class="aa__section" id="aa_spots_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.spots.title">Iluminação (Spots)</h3>
+      <p class="aa__section-desc" data-i18n="aa.spots.desc">Pontos de luz embutidos nas faces do módulo.</p>
+    </div>
+
+    <label class="aa__toggle">
+      <input type="checkbox" id="aa_spots_inc" onchange="AutoAcm.toggleSpots()">
+      <span class="aa__toggle-track">
+        <span class="aa__toggle-thumb"></span>
+      </span>
+      <span class="aa__toggle-label" data-i18n="aa.spots.include">Incluir spots</span>
+    </label>
+
+    <div class="aa__spots-cfg" id="aa_spots_cfg" hidden>
+
+      <!-- Tipo -->
+      <div class="field">
+        <label class="field__label" data-i18n="aa.spots.type">Tipo de luminária</label>
+        <div class="aa__pills aa__pills--3" role="radiogroup">
+          <button type="button" class="aa__pill is-active" data-spot-type="circular" onclick="AutoAcm.setSpotTipo('circular')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/></svg>
+            <span data-i18n="aa.spots.type.circular">Circular</span>
+          </button>
+          <button type="button" class="aa__pill" data-spot-type="quadrado" onclick="AutoAcm.setSpotTipo('quadrado')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="1"/><rect x="10" y="10" width="4" height="4" fill="currentColor"/></svg>
+            <span data-i18n="aa.spots.type.quadrado">Quadrado</span>
+          </button>
+          <button type="button" class="aa__pill" data-spot-type="linear" onclick="AutoAcm.setSpotTipo('linear')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="18" height="4" rx="1"/><line x1="7" y1="12" x2="17" y2="12" stroke-width="2.5"/></svg>
+            <span data-i18n="aa.spots.type.linear">Linear</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dimensões por tipo -->
+      <!-- CIRCULAR -->
+      <div class="aa__form-grid aa__form-grid--3" id="aa_spots_dim_circ">
+        <div class="field">
+          <label class="field__label" for="aa_spots_qtd" data-i18n="aa.spots.qtd">Quantidade</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_qtd" value="5" min="1" max="100" step="1">
+            <span class="aa__number-unit">un</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_dia" data-i18n="aa.spots.dia">Diâmetro</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_dia" value="85" min="20" step="5">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_prof_c" data-i18n="aa.spots.prof">Profundidade</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_prof_c" value="30" min="5" step="5">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUADRADO -->
+      <div class="aa__form-grid aa__form-grid--3" id="aa_spots_dim_quad" hidden>
+        <div class="field">
+          <label class="field__label" for="aa_spots_qtd_q" data-i18n="aa.spots.qtd">Quantidade</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_qtd_q" value="5" min="1" max="100" step="1">
+            <span class="aa__number-unit">un</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_lado" data-i18n="aa.spots.lado">Lado</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_lado" value="85" min="20" step="5">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_prof_q" data-i18n="aa.spots.prof">Profundidade</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_prof_q" value="30" min="5" step="5">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LINEAR -->
+      <div class="aa__form-grid aa__form-grid--4" id="aa_spots_dim_lin" hidden>
+        <div class="field">
+          <label class="field__label" for="aa_spots_qtd_l" data-i18n="aa.spots.qtd">Quantidade</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_qtd_l" value="3" min="1" max="50" step="1">
+            <span class="aa__number-unit">un</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_comp_l" data-i18n="aa.spots.comp">Comprimento</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_comp_l" value="500" min="50" step="50">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_larg_l" data-i18n="aa.spots.larg">Largura</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_larg_l" value="20" min="5" step="5">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_prof_l" data-i18n="aa.spots.prof">Profundidade</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_prof_l" value="15" min="5" step="5">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Distribuição -->
+      <div class="aa__form-grid aa__form-grid--2">
+        <div class="field">
+          <label class="field__label" for="aa_spots_recuo" data-i18n="aa.spots.recuo">Recuo inicial</label>
+          <div class="aa__number">
+            <input type="number" id="aa_spots_recuo" value="800" min="0" step="50">
+            <span class="aa__number-unit">mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label" for="aa_spots_modo" data-i18n="aa.spots.modo">Distribuição</label>
+          <div class="aa__select-wrap">
+            <select class="aa__select" id="aa_spots_modo">
+              <option value="ambas" selected data-i18n="aa.spots.modo.ambas">Ambos os lados</option>
+              <option value="esquerda" data-i18n="aa.spots.modo.esq">Só pela esquerda</option>
+              <option value="direita" data-i18n="aa.spots.modo.dir">Só pela direita</option>
+            </select>
+            <svg class="aa__select-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Faces onde aplicar -->
+      <div class="field">
+        <label class="field__label" data-i18n="aa.spots.faces">Aplicar nas faces</label>
+        <div class="aa__chips">
+          <button type="button" class="aa__chip is-active" data-spot-face="frontal" onclick="AutoAcm.toggleSpotFace('frontal')">
+            <span data-i18n="aa.role.frontal">Frontal</span>
+          </button>
+          <button type="button" class="aa__chip" data-spot-face="traseira" onclick="AutoAcm.toggleSpotFace('traseira')">
+            <span data-i18n="aa.role.traseira">Traseira</span>
+          </button>
+          <button type="button" class="aa__chip" data-spot-face="topo" onclick="AutoAcm.toggleSpotFace('topo')">
+            <span data-i18n="aa.role.topo">Topo</span>
+          </button>
+          <button type="button" class="aa__chip" data-spot-face="base" onclick="AutoAcm.toggleSpotFace('base')">
+            <span data-i18n="aa.role.base">Base</span>
+          </button>
+          <button type="button" class="aa__chip" data-spot-face="esq" onclick="AutoAcm.toggleSpotFace('esq')">
+            <span data-i18n="aa.role.esq">Esquerda</span>
+          </button>
+          <button type="button" class="aa__chip" data-spot-face="dir" onclick="AutoAcm.toggleSpotFace('dir')">
+            <span data-i18n="aa.role.dir">Direita</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ PREVIEW 2D PLANIFICADO ═════════ -->
+  <section class="aa__section" id="aa_preview_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.preview.title">Preview planificado</h3>
+      <p class="aa__section-desc" data-i18n="aa.preview.desc">Layout "aberto" da fachada com emendas, dobras, juntas e spots. Arraste as emendas ou clique para cortar em novas posições.</p>
+    </div>
+
+    <div class="aa__preview-toolbar">
+      <span class="aa__preview-toolbar-label" data-i18n="aa.preview.tools">Ferramentas</span>
+      <button type="button" class="aa__tool is-active" data-plan-tool="pan" onclick="AutoAcm.setPlanTool('pan')" data-i18n-title="aa.preview.tool.pan.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l3-3-3-3"/><path d="M19 9l3 3-3 3"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+        <span data-i18n="aa.preview.tool.pan">Navegar</span>
+      </button>
+      <button type="button" class="aa__tool" data-plan-tool="moveH" onclick="AutoAcm.setPlanTool('moveH')" data-i18n-title="aa.preview.tool.moveH.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="8,6 2,12 8,18"/><polyline points="16,6 22,12 16,18"/></svg>
+        <span data-i18n="aa.preview.tool.moveH">Mover ↔</span>
+      </button>
+      <button type="button" class="aa__tool" data-plan-tool="moveV" onclick="AutoAcm.setPlanTool('moveV')" data-i18n-title="aa.preview.tool.moveV.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6,8 12,2 18,8"/><polyline points="6,16 12,22 18,16"/></svg>
+        <span data-i18n="aa.preview.tool.moveV">Mover ↕</span>
+      </button>
+      <button type="button" class="aa__tool" data-plan-tool="cutV" onclick="AutoAcm.setPlanTool('cutV')" data-i18n-title="aa.preview.tool.cutV.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/><line x1="12" y1="12" x2="12" y2="22"/></svg>
+        <span data-i18n="aa.preview.tool.cutV">Cortar ↕</span>
+      </button>
+      <button type="button" class="aa__tool" data-plan-tool="cutH" onclick="AutoAcm.setPlanTool('cutH')" data-i18n-title="aa.preview.tool.cutH.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        <span data-i18n="aa.preview.tool.cutH">Cortar ↔</span>
+      </button>
+      <button type="button" class="aa__tool" onclick="AutoAcm.planResetView()" data-i18n-title="aa.preview.tool.resetview.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        <span data-i18n="aa.preview.tool.resetview">Ajustar</span>
+      </button>
+      <button type="button" class="aa__tool aa__tool--danger" onclick="AutoAcm.planReset()" data-i18n-title="aa.preview.tool.reset.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span data-i18n="aa.preview.tool.reset">Resetar</span>
+      </button>
+    </div>
+
+    <div class="aa__canvas-wrap">
+      <canvas id="aa_preview" class="aa__canvas"></canvas>
+    </div>
+  </section>
+
+  <!-- ═════════ PREVIEW 3D ISOMÉTRICO ═════════ -->
+  <section class="aa__section" id="aa_preview3d_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.preview3d.title">Preview 3D isométrico</h3>
+      <p class="aa__section-desc" data-i18n="aa.preview3d.desc">Visualização volumétrica da estrutura. Arraste para orbitar, Shift+arraste para pan, scroll para zoom.</p>
+    </div>
+
+    <!-- Linha 1: Camadas -->
+    <div class="aa__preview-toolbar aa__preview-toolbar--layers">
+      <span class="aa__preview-toolbar-label" data-i18n="aa.preview3d.layers">Camadas</span>
+      <label class="aa__layer-chk"><input type="checkbox" id="aa3d_acm"  checked onchange="AutoAcm.scheduleRedraw3D()"><span>ACM</span></label>
+      <label class="aa__layer-chk"><input type="checkbox" id="aa3d_met"  checked onchange="AutoAcm.scheduleRedraw3D()"><span data-i18n="aa.preview3d.layer.met">Metalon</span></label>
+      <label class="aa__layer-chk"><input type="checkbox" id="aa3d_em"   checked onchange="AutoAcm.scheduleRedraw3D()"><span data-i18n="aa.preview3d.layer.em">Emendas</span></label>
+      <label class="aa__layer-chk"><input type="checkbox" id="aa3d_fita" checked onchange="AutoAcm.scheduleRedraw3D()"><span data-i18n="aa.preview3d.layer.fita">Fita</span></label>
+      <label class="aa__layer-chk"><input type="checkbox" id="aa3d_spot" checked onchange="AutoAcm.scheduleRedraw3D()"><span data-i18n="aa.preview3d.layer.spot">Spots</span></label>
+
+      <div class="aa__preview3d-views">
+        <button type="button" class="aa__view-btn" data-view="front" title="Frontal" onclick="AutoAcm.setView3D('front')"><span data-i18n="aa.preview3d.view.front">Frontal</span></button>
+        <button type="button" class="aa__view-btn" data-view="side"  title="Lateral" onclick="AutoAcm.setView3D('side')"><span data-i18n="aa.preview3d.view.side">Lateral</span></button>
+        <button type="button" class="aa__view-btn" data-view="top"   title="Topo" onclick="AutoAcm.setView3D('top')"><span data-i18n="aa.preview3d.view.top">Topo</span></button>
+        <button type="button" class="aa__view-btn is-active" data-view="iso" title="Isométrica" onclick="AutoAcm.setView3D('iso')"><span data-i18n="aa.preview3d.view.iso">Iso</span></button>
+        <button type="button" class="aa__view-btn" data-view="fit"   title="Ajustar à tela" onclick="AutoAcm.setView3D('fit')"><span data-i18n="aa.preview3d.view.fit">Fit</span></button>
+      </div>
+
+      <div class="aa__preview3d-cam">
+        <button type="button" class="aa__tool aa__tool--icon" title="Girar esquerda" onclick="AutoAcm.rot3D(-15,0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 4.2-7.6"/><polyline points="3 4 3 10 9 10"/></svg></button>
+        <button type="button" class="aa__tool aa__tool--icon" title="Girar direita" onclick="AutoAcm.rot3D(15,0)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-4.2-7.6"/><polyline points="21 4 21 10 15 10"/></svg></button>
+        <button type="button" class="aa__tool aa__tool--icon" title="Zoom +" onclick="AutoAcm.zoom3D(1.2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button type="button" class="aa__tool aa__tool--icon" title="Zoom −" onclick="AutoAcm.zoom3D(0.8)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg></button>
+        <button type="button" class="aa__tool aa__tool--icon" title="Reset câmera" onclick="AutoAcm.reset3D()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Linha 2: Ferramentas -->
+    <div class="aa__preview-toolbar">
+      <span class="aa__preview-toolbar-label" data-i18n="aa.preview.tools">Ferramentas</span>
+      <button type="button" class="aa__tool is-active" data-tool3d="orbit" onclick="AutoAcm.setTool3D('orbit')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="10" ry="4"/></svg>
+        <span data-i18n="aa.preview3d.tool.orbit">Orbitar</span>
+      </button>
+      <button type="button" class="aa__tool" data-tool3d="cut" onclick="AutoAcm.setTool3D('cut')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        <span data-i18n="aa.preview3d.tool.cut">Tesoura</span>
+      </button>
+      <button type="button" class="aa__tool" data-tool3d="cutauto" onclick="AutoAcm.setTool3D('cutauto')" data-i18n-title="aa.preview3d.tool.cutauto.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.42 9.42 8 12"/><circle cx="4" cy="8" r="2"/><path d="m14 6-8.58 8.58"/><circle cx="4" cy="16" r="2"/><path d="M10.8 14.8 14 18"/><path d="M16 12h-2"/><path d="M22 12h-2"/></svg>
+        <span data-i18n="aa.preview3d.tool.cutauto">Tesoura Auto</span>
+      </button>
+      <button type="button" class="aa__tool" data-tool3d="moveH" onclick="AutoAcm.setTool3D('moveH')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+        <span data-i18n="aa.preview3d.tool.moveH">Mover H</span>
+      </button>
+      <button type="button" class="aa__tool" data-tool3d="moveV" onclick="AutoAcm.setTool3D('moveV')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6,8 12,2 18,8"/><polyline points="6,16 12,22 18,16"/></svg>
+        <span data-i18n="aa.preview3d.tool.moveV">Mover V</span>
+      </button>
+      <button type="button" class="aa__tool" id="aa3d_sym_btn" onclick="AutoAcm.toggleSym()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M8 7l-4 5 4 5"/><path d="M16 7l4 5-4 5"/></svg>
+        <span data-i18n="aa.preview3d.tool.sym">Simétrico</span>
+      </button>
+
+      <!-- Toggle do ímã (snap a perfis existentes durante o placement) -->
+      <button type="button" class="aa__tool aa__tool--icon" id="aa3d_magnet_btn" onclick="AutoAcm.toggleMagnet()" data-i18n-title="aa.preview3d.magnet.tip">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v8a6 6 0 0 0 12 0V4"/><line x1="6" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="18" y2="8"/></svg>
+      </button>
+
+      <!-- Botão Adicionar ferragem (abre popover) -->
+      <div class="aa__add-wrap">
+        <button type="button" class="aa__tool aa__tool--accent" id="aa3d_add_btn" onclick="AutoAcm.toggleAddPop(event)" data-i18n-title="aa.preview3d.tool.add.tip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span data-i18n="aa.preview3d.tool.add">Adicionar</span>
+        </button>
+
+        <div class="aa__add-pop" id="aa3d_add_pop" hidden>
+          <div class="aa__add-pop-header">
+            <span data-i18n="aa.preview3d.add.title">Nova ferragem</span>
+            <button type="button" class="aa__add-pop-close" onclick="AutoAcm.closeAddPop()" title="Fechar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          <div class="aa__add-pop-row">
+            <span class="aa__add-pop-label" data-i18n="aa.preview3d.add.profile">Perfil (mm)</span>
+            <div class="aa__add-pop-profile">
+              <label class="aa__add-pop-field">
+                <span data-i18n="aa.preview3d.add.width">Largura</span>
+                <input type="number" id="aa3d_add_pw" min="5" max="200" step="1" value="20">
+              </label>
+              <span class="aa__add-pop-x">×</span>
+              <label class="aa__add-pop-field">
+                <span data-i18n="aa.preview3d.add.height">Altura</span>
+                <input type="number" id="aa3d_add_ph" min="5" max="200" step="1" value="20">
+              </label>
+            </div>
+          </div>
+
+          <div class="aa__add-pop-row">
+            <span class="aa__add-pop-label" data-i18n="aa.preview3d.add.type">Tipo</span>
+            <div class="aa__add-pop-opts">
+              <button type="button" class="aa__add-opt is-active" data-add-cat="met" onclick="AutoAcm.setAddCat('met')" data-i18n="aa.preview3d.add.type.met">Estrutura</button>
+              <button type="button" class="aa__add-opt" data-add-cat="em" onclick="AutoAcm.setAddCat('em')" data-i18n="aa.preview3d.add.type.em">Emenda</button>
+            </div>
+          </div>
+
+          <div class="aa__add-pop-row">
+            <span class="aa__add-pop-label" data-i18n="aa.preview3d.add.orient">Orientação</span>
+            <div class="aa__add-pop-opts">
+              <button type="button" class="aa__add-opt is-active" data-add-orient="v" onclick="AutoAcm.setAddOrient('v')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/></svg>
+                <span data-i18n="aa.preview3d.add.vert">Vertical</span>
+              </button>
+              <button type="button" class="aa__add-opt" data-add-orient="h" onclick="AutoAcm.setAddOrient('h')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+                <span data-i18n="aa.preview3d.add.horiz">Horizontal</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="aa__add-pop-row">
+            <span class="aa__add-pop-label" data-i18n="aa.preview3d.add.face">Face</span>
+            <select class="aa__add-pop-select" id="aa3d_add_face">
+              <!-- Opções populadas via AutoAcm._fillAddFaces() (somente faces habilitadas) -->
+            </select>
+          </div>
+
+          <div class="aa__add-pop-row">
+            <label class="aa__add-pop-check">
+              <input type="checkbox" id="aa3d_add_fita" checked>
+              <span data-i18n="aa.preview3d.add.fita">Incluir fita dupla-face entre a peça e o ACM</span>
+            </label>
+          </div>
+
+          <div class="aa__add-pop-actions">
+            <button type="button" class="btn btn--secondary btn--sm" onclick="AutoAcm.closeAddPop()" data-i18n="aa.preview3d.add.cancel">Cancelar</button>
+            <button type="button" class="btn btn--primary btn--sm" id="aa3d_add_confirm" onclick="AutoAcm.confirmAdd()">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span data-i18n="aa.preview3d.add.confirm">Adicionar</span>
+            </button>
+          </div>
+
+          <p class="aa__add-pop-hint" data-i18n="aa.preview3d.add.hint">Depois de adicionada, use Mover H/V para reposicionar com cota digitada.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="aa__canvas-wrap">
+      <canvas id="aa_preview3d" class="aa__canvas aa__canvas--3d"></canvas>
+    </div>
+    <div class="aa__preview3d-hint" data-i18n="aa.preview3d.hint">Arrastar = orbitar · Shift+arrastar = pan · Scroll = zoom</div>
+  </section>
+
+  <!-- ═════════ RESUMO DOS PARÂMETROS ═════════ -->
+  <section class="aa__section" id="aa_resumo_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.resumo.title">Resumo dos parâmetros</h3>
+      <p class="aa__section-desc" data-i18n="aa.resumo.desc">Configuração atual do módulo ativo. Revise antes de gerar.</p>
+    </div>
+    <div class="aa__resumo-grid">
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.dim">Dimensões</span>
+        <span class="aa__resumo-value" id="aa_r_dim">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.acm">ACM</span>
+        <span class="aa__resumo-value" id="aa_r_acm">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.chapa">Chapa</span>
+        <span class="aa__resumo-value" id="aa_r_chapa">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.metalon">Metalon</span>
+        <span class="aa__resumo-value" id="aa_r_metalon">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.junta">Junta</span>
+        <span class="aa__resumo-value" id="aa_r_junta">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.emenda">Emenda</span>
+        <span class="aa__resumo-value" id="aa_r_emenda">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.fita">Fita DF</span>
+        <span class="aa__resumo-value" id="aa_r_fita">—</span>
+      </div>
+      <div class="aa__resumo-item">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.spots">Spots</span>
+        <span class="aa__resumo-value" id="aa_r_spots">—</span>
+      </div>
+      <div class="aa__resumo-item aa__resumo-item--wide">
+        <span class="aa__resumo-label" data-i18n="aa.resumo.faces">Faces revestidas</span>
+        <span class="aa__resumo-value" id="aa_r_faces">—</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ GERAR — chamada à ação principal ═════════ -->
+  <section class="aa__section aa__gerar-section" id="aa_gerar_section" hidden>
+    <div class="aa__gerar">
+      <div class="aa__gerar-info">
+        <h3 class="aa__gerar-title" data-i18n="aa.gerar.title">Pronto pra gerar?</h3>
+        <p class="aa__gerar-desc" data-i18n="aa.gerar.desc">Constrói a estrutura completa no SketchUp com metalon, emendas, fita dupla-face e spots.</p>
+      </div>
+      <div class="aa__gerar-buttons">
+        <button class="btn btn--primary btn--lg aa__gerar-btn" id="aa_btn_gerar" onclick="AutoAcm.gerar()">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+          <span id="aa_btn_gerar_label" data-i18n="aa.gerar.btn">Gerar estrutura no SketchUp</span>
+        </button>
+        <button class="btn btn--secondary btn--lg aa__gerar-btn-all" id="aa_btn_gerar_all" hidden onclick="AutoAcm.gerarTodos()">
+          <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M14 14h7v7h-7z"/><path d="M3 14h7v7H3z"/>
+          </svg>
+          <span id="aa_btn_gerar_all_label">Gerar todos</span>
+        </button>
+      </div>
+    </div>
+    <div class="aa__gerar-status" id="aa_gerar_status" hidden></div>
+  </section>
+
+  <!-- ═════════ QUANTITATIVO DE MATERIAIS (após gerar) ═════════ -->
+  <section class="aa__section" id="aa_quant_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.quant.title">Quantitativo de materiais</h3>
+      <p class="aa__section-desc" data-i18n="aa.quant.desc">Totais calculados a partir da estrutura gerada no SketchUp.</p>
+    </div>
+    <div class="aa__quant-grid" id="aa_quant_grid">
+      <!-- cards populados via JS -->
+    </div>
+  </section>
+
+  <!-- ═════════ PLANO DE CORTE (FASE 10) ═════════ -->
+  <section class="aa__section" id="aa_plano_section" hidden>
+    <div class="aa__section-header">
+      <h3 class="aa__section-title" data-i18n="aa.plano.title">Plano de corte</h3>
+      <p class="aa__section-desc" data-i18n="aa.plano.desc">Documento imprimível com as vistas, lista de peças e quantitativo. Abre num navegador pra você imprimir ou salvar como PDF.</p>
+    </div>
+    <div class="aa__plano-actions">
+      <button class="btn btn--secondary btn--lg" id="aa_btn_plano" onclick="AutoAcm.gerarPlano()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span id="aa_btn_plano_label" data-i18n="aa.plano.btn">Exportar plano de corte</span>
+      </button>
+      <button class="btn btn--primary btn--lg" id="aa_btn_plano_all" hidden onclick="AutoAcm.gerarPlanoMulti()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+          <path d="M21 8V5a2 2 0 0 0-2-2h-3"/>
+          <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
+          <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+          <rect x="7" y="7" width="10" height="10" rx="1"/>
+        </svg>
+        <span id="aa_btn_plano_all_label" data-i18n="aa.plano.all">Plano de todos os módulos</span>
+      </button>
+      <button class="btn btn--ghost btn--lg" id="aa_btn_share_wpp" onclick="AutoAcm.compartilharWhatsApp()">
+        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <span data-i18n="aa.plano.share">Compartilhar via WhatsApp</span>
+      </button>
+    </div>
+    <div class="aa__gerar-status" id="aa_plano_status" hidden></div>
+  </section>
+
+</div>

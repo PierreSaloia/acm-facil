@@ -1,0 +1,2 @@
+Texturas de madeira: ambientCG (ambientcg.com) - licenca CC0 (dominio publico).
+Wood048->carvalho-mel, Wood049->freijo, Wood026->itapua, Wood051->nogueira, Wood062->carvalho-fume, Wood067->imbuia.
