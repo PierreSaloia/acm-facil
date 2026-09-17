@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Luminoso (ferramenta de toolbar)
+# SignEng — Luminoso (ferramenta de toolbar)
 # ═══════════════════════════════════════════════════════════════════════════
 # Gera luminoso em ACM: redondo / quadrado / retangular (canto arredondado),
 # dupla-face ou face única, com corpo (arco), tampas (borda externa + testa),
@@ -37,7 +37,7 @@ module ACMFacil
         end
 
         @dialog = UI::HtmlDialog.new(
-          dialog_title:    "ACMFacil — Luminoso",
+          dialog_title:    "SignEng — Luminoso",
           preferences_key: "com.acmfacil.luminoso",
           width:           440,
           height:          760,
@@ -272,11 +272,11 @@ module ACMFacil
           inst = ent if ent && ent.valid? && ent.is_a?(Sketchup::ComponentInstance)
         end
 
-        model.start_operation("Gerar Luminoso ACMFacil", true)
+        model.start_operation("Gerar Luminoso SignEng", true)
         novo = inst.nil?
 
         if novo
-          defn = model.definitions.add("ACMFacil Luminoso")
+          defn = model.definitions.add("SignEng Luminoso")
         else
           defn = inst.definition
           defn.entities.clear!
@@ -331,7 +331,7 @@ module ACMFacil
         # existe (material com textura, pronto pra render); fallback RGB.
         mat_arco  = acm_material(p[:cor_arco_nome],  p[:cor_arco_rgb])
         mat_borda = acm_material(p[:cor_borda_nome], p[:cor_borda_rgb])
-        mat_metal = material_rgb("ACMFacil Metal", [90, 90, 90])
+        mat_metal = material_rgb("SignEng Metal", [90, 90, 90])
         mat_acr   = p[:acr_tipo] == 'cristal' ?
                     material_rgb("Acrílico cristal", [225, 232, 238], 0.35) :
                     material_rgb("Acrílico leitoso", [246, 246, 244], 0.75)
@@ -896,7 +896,7 @@ module ACMFacil
         f.reverse! if f.normal.dot(n) < 0
         f.pushpull(mm2in(2.5))
         suavizar(grp)
-        grp.material = material_rgb("ACMFacil Inox", [200, 200, 205])
+        grp.material = material_rgb("SignEng Inox", [200, 200, 205])
         grp.name = "parafuso"
         etiquetar(grp, "LUM - Parafusos")
         grp
@@ -976,7 +976,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, result: { "pts" => [] } }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         r = Core::FirebaseClient.call_function("luminosoCompute", payload, id_token)
         if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
@@ -994,8 +994,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

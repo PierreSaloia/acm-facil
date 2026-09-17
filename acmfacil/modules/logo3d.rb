@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ============================================================================
-# ACMFacil — Módulo LOGO 3D
+# SignEng — Módulo LOGO 3D
 # ============================================================================
 # Importa um arquivo DXF/DWG, extrude pra criar um logo 3D sólido ou oco,
 # com opção de contorno externo (tipo placa atrás do logo).
@@ -124,7 +124,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, paths_2d: [], dims_mm: { "w" => 0, "h" => 0 }, subpaths: [] }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         payload = { "kind" => kind, "content" => content }
 
@@ -144,8 +144,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

@@ -2356,7 +2356,7 @@ window.AutoAcm = {
       g.font = '10px "Courier New", monospace';
       g.textAlign = 'right';
       g.fillStyle = 'rgba(255,255,255,0.7)';
-      g.fillText(dt + '  ·  ACMFacil / Auto-ACM', CW - 18, 18);
+      g.fillText(dt + '  ·  SignEng / Auto-ACM', CW - 18, 18);
       g.fillText('Auto-ACM  ' + q.w + '×' + q.h + '×' + q.d + 'mm  ·  Met.' + q.metalon_wh + '  ·  Cor: ' + (q.cor_acm || '-'), CW - 18, 34);
       if (subtitle) {
         g.font = '11px "Segoe UI", "Inter", sans-serif';
@@ -4352,7 +4352,7 @@ window.AutoAcm = {
           ${resumo}
           ${assinatura}
           <div class="capa-footer">
-            <span>ACMFacil · Plano de Corte</span>
+            <span>SignEng · Plano de Corte</span>
             <span>${dt}</span>
           </div>
         </div>
@@ -4538,13 +4538,13 @@ window.AutoAcm = {
 <div class="capa">
   <div class="capa__frame">
     ${empresaBand}
-    <div class="capa-kicker">ACMFacil · Auto-ACM</div>
+    <div class="capa-kicker">SignEng · Auto-ACM</div>
     <h1>Plano de Corte de Fachada</h1>
     <div class="capa-sub">Projeto multi-módulo · ${totalMod} módulos · Gerado em ${dt}</div>
     ${capaTable}
     ${resumoHtml}
     <div class="capa-footer">
-      <span>ACMFacil · Plano de Corte Consolidado</span>
+      <span>SignEng · Plano de Corte Consolidado</span>
       <span>${dt}</span>
     </div>
   </div>
@@ -4696,7 +4696,7 @@ window.AutoAcm = {
     const totBarras = Math.ceil(totMetEm / 6);
 
     const lines = [];
-    lines.push('*ACMFacil — Resumo de Materiais*');
+    lines.push('*SignEng — Resumo de Materiais*');
     lines.push('');
     lines.push(`📦 Módulos: ${gerados.length}`);
     gerados.forEach((m, i) => {
@@ -4708,7 +4708,7 @@ window.AutoAcm = {
     lines.push(`• Metalon: ${totMetEm.toFixed(2)} m · ${totBarras} barras 6m`);
     lines.push(`• Fita dupla-face: ${totFita.toFixed(2)} m`);
     lines.push('');
-    lines.push('_Gerado pelo ACMFacil_');
+    lines.push('_Gerado pelo SignEng_');
 
     const message = lines.join('\n');
     const url = 'https://wa.me/?text=' + encodeURIComponent(message);

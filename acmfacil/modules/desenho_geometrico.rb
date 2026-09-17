@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Desenho Geométrico (ferramenta de toolbar) — FASE 1
+# SignEng — Desenho Geométrico (ferramenta de toolbar) — FASE 1
 # ═══════════════════════════════════════════════════════════════════════════
 # FOTO → MOSAICO LOW-POLY em ACM (estilo "quadro geométrico de pet"):
 # o usuário carrega uma imagem (JPG/PNG), o SERVIDOR (geoArtCompute) faz o
@@ -32,7 +32,7 @@ module ACMFacil
           return
         end
         @dialog = UI::HtmlDialog.new(
-          dialog_title:    "ACMFacil — Desenho Geométrico",
+          dialog_title:    "SignEng — Desenho Geométrico",
           preferences_key: "com.acmfacil.geoart",
           width:           460,
           height:          760,
@@ -200,7 +200,7 @@ module ACMFacil
         esp = esp_mm / 25.4
         fol = folga_mm / 25.4
 
-        model.start_operation("Desenho Geométrico ACMFacil", true)
+        model.start_operation("Desenho Geométrico SignEng", true)
         grp = model.active_entities.add_group
         grp.name = "GeoArt #{larg_mm.round}mm"
         grp.layer = model.layers.add("GEO - Mosaico")
@@ -262,7 +262,7 @@ module ACMFacil
         dim = [max[0] - min[0], max[1] - min[1], max[2] - min[2]].max
         sc  = (larg_mm / 25.4) / (dx > 1e-9 ? dx : (dim > 1e-9 ? dim : 1.0))
 
-        model.start_operation("Desenho Geométrico 3D ACMFacil", true)
+        model.start_operation("Desenho Geométrico 3D SignEng", true)
         pm  = Geom::PolygonMesh.new(pts.length, faces.length)
         idx = pts.map do |x, y, z|
           pm.add_point(Geom::Point3d.new((x - min[0]) * sc, (y - min[1]) * sc, (z - min[2]) * sc))
@@ -296,7 +296,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, result: { "ok" => true, "tmp" => true } }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         r = Core::FirebaseClient.call_function("geoArt3D", payload, id_token, "us-central1", 560)
         if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
@@ -314,9 +314,9 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
                 when "INVALID_ARGUMENT"  then r[:error].to_s
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end
@@ -331,7 +331,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, result: { "ok" => true, "tmp" => true } }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         r = Core::FirebaseClient.call_function("geoArtCompute", payload, id_token)
         if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
@@ -349,9 +349,9 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
                 when "INVALID_ARGUMENT"  then r[:error].to_s
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

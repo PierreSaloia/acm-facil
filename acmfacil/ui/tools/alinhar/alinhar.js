@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Alinhar (diálogo da ferramenta)
+   SignEng — Alinhar (diálogo da ferramenta)
    ══════════════════════════════════════════════════════════════════════════
    Estado do pick (objeto 1/2) vive no Ruby (Generator::Alinhar). Este JS só
    mostra o status (via AlinharUI.onPick, chamado pelo Ruby) e envia a escolha
@@ -33,7 +33,7 @@ const AlinharUI = {
       msgOk: 'Alinhado! Pode aplicar outra opção ou recomeçar.',
       msgNoMove: 'Já estava alinhado — nada foi movido.',
       msgFaltam: 'Clique os 2 objetos no modelo antes de aplicar.',
-      msgBlocked: 'Licença inválida. Faça login no painel do ACMFacil.',
+      msgBlocked: 'Licença inválida. Faça login no painel do SignEng.',
       msgError: 'Erro: '
     },
     es: {
@@ -51,7 +51,7 @@ const AlinharUI = {
       msgOk: '¡Alineado! Puedes aplicar otra opción o reiniciar.',
       msgNoMove: 'Ya estaba alineado — nada se movió.',
       msgFaltam: 'Haz clic en los 2 objetos antes de aplicar.',
-      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de ACMFacil.',
+      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de SignEng.',
       msgError: 'Error: '
     },
     en: {
@@ -69,7 +69,7 @@ const AlinharUI = {
       msgOk: 'Aligned! Apply another option or restart.',
       msgNoMove: 'Already aligned — nothing moved.',
       msgFaltam: 'Click the 2 objects in the model before applying.',
-      msgBlocked: 'Invalid license. Log in on the ACMFacil panel.',
+      msgBlocked: 'Invalid license. Log in on the SignEng panel.',
       msgError: 'Error: '
     }
   },

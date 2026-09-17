@@ -36,7 +36,7 @@ require 'time'
 module ACMFacil
   module Core
     module Auth
-      DEFAULT_NS = "ACMFacil".freeze
+      DEFAULT_NS = "SignEng".freeze
       OFFLINE_MODE = true.freeze
 
       # ── Grace period offline (segundos) ──

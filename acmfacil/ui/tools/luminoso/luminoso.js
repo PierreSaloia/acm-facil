@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Luminoso (diálogo da ferramenta)
+   SignEng — Luminoso (diálogo da ferramenta)
    ══════════════════════════════════════════════════════════════════════════
    Gera/regenera o luminoso via Bridge. Se um luminoso gerado for carregado
    (Carregar selecionado), o Gerar REGENERA aquele componente no lugar.
@@ -57,8 +57,8 @@ const LuminosoUI = {
       parafDistLat: 'Dist. bordas laterais (mm)', parafDistTb: 'Dist. bordas topo/baixo (mm)',
       msgOk: 'Luminoso gerado!', msgRegen: 'Luminoso atualizado!',
       msgCarregado: 'Parâmetros carregados — edite e clique Regenerar.',
-      msgNadaSel: 'Selecione um luminoso gerado pelo ACMFacil primeiro.',
-      msgBlocked: 'Licença inválida. Faça login no painel do ACMFacil.',
+      msgNadaSel: 'Selecione um luminoso gerado pelo SignEng primeiro.',
+      msgBlocked: 'Licença inválida. Faça login no painel do SignEng.',
       msgError: 'Erro: ',
       tabParams: 'Parâmetros', tabMats: 'Materiais & Corte',
       secChapaAcm: 'CHAPA DE ACM (PRA CÁLCULO)', chapaComp: 'Comprimento (mm)', chapaLarg: 'Largura (mm)',
@@ -113,8 +113,8 @@ const LuminosoUI = {
       parafDistLat: 'Dist. bordes laterales (mm)', parafDistTb: 'Dist. bordes sup/inf (mm)',
       msgOk: '¡Luminoso generado!', msgRegen: '¡Luminoso actualizado!',
       msgCarregado: 'Parámetros cargados — edita y pulsa Regenerar.',
-      msgNadaSel: 'Selecciona primero un luminoso generado por ACMFacil.',
-      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de ACMFacil.',
+      msgNadaSel: 'Selecciona primero un luminoso generado por SignEng.',
+      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de SignEng.',
       msgError: 'Error: ',
       tabParams: 'Parámetros', tabMats: 'Materiales y Corte',
       secChapaAcm: 'CHAPA DE ACM (PARA CÁLCULO)', chapaComp: 'Largo (mm)', chapaLarg: 'Ancho (mm)',
@@ -169,8 +169,8 @@ const LuminosoUI = {
       parafDistLat: 'Side edge dist. (mm)', parafDistTb: 'Top/bottom edge dist. (mm)',
       msgOk: 'Lightbox generated!', msgRegen: 'Lightbox updated!',
       msgCarregado: 'Parameters loaded — edit and click Regenerate.',
-      msgNadaSel: 'Select an ACMFacil-generated lightbox first.',
-      msgBlocked: 'Invalid license. Log in on the ACMFacil panel.',
+      msgNadaSel: 'Select an SignEng-generated lightbox first.',
+      msgBlocked: 'Invalid license. Log in on the SignEng panel.',
       msgError: 'Error: ',
       tabParams: 'Parameters', tabMats: 'Materials & Cutting',
       secChapaAcm: 'ACM SHEET (FOR ESTIMATE)', chapaComp: 'Length (mm)', chapaLarg: 'Width (mm)',
@@ -1204,7 +1204,7 @@ const LuminosoUI = {
 
     const brand = lbl => `<div class="brand-strip">
       ${empresa.logo ? `<img src="${empresa.logo}">` : ''}
-      <span class="brand-strip__name">${E(empresa.nome || 'ACMFacil')}</span>
+      <span class="brand-strip__name">${E(empresa.nome || 'SignEng')}</span>
       <span class="brand-strip__sep"></span>
       <span class="brand-strip__label">${lbl}</span>
     </div>`;
@@ -1294,11 +1294,11 @@ const LuminosoUI = {
   <div>
     <span class="capa-kicker">Plano de Corte · Luminoso</span>
     <h2>Luminoso ${fmtNome} ${dimStr}</h2>
-    <p class="capa-sub">Gerado em ${dt} · ACMFacil</p>
+    <p class="capa-sub">Gerado em ${dt} · SignEng</p>
   </div>
   ${capaCorpo}
   ${assinatura}
-  <div class="capa-footer"><span>ACMFacil · Plano de Corte</span><span>${dt}</span></div>
+  <div class="capa-footer"><span>SignEng · Plano de Corte</span><span>${dt}</span></div>
 </div></div>
 
 ${vistasHtml.replace('{BRAND_VISTAS}', brand('Vistas do Projeto'))}

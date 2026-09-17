@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Planifica
+# SignEng — Planifica
 # ═══════════════════════════════════════════════════════════════════════════
 # Planificação + plano de corte (nesting) de móveis em MDF.
 # Fluxo: seleciona o móvel no SketchUp → detecta as chapas (L×A×espessura) →
@@ -264,7 +264,7 @@ module ACMFacil
 
         s = +""
         s << "%!PS-Adobe-3.0 EPSF-3.0\n"
-        s << "%%Creator: ACMFacil Planifica\n"
+        s << "%%Creator: SignEng Planifica\n"
         s << "%%BoundingBox: 0 0 #{bb_w} #{bb_h}\n"
         s << "%%HiResBoundingBox: 0 0 #{(total_w_mm * mm).round(3)} #{(total_h_mm * mm).round(3)}\n"
         s << "%%EndComments\n"
@@ -324,11 +324,11 @@ module ACMFacil
       # temporário (travado, descartável). Atualiza ao vivo conforme o usuário
       # corta/adiciona fita no preview 2D.
       # ──────────────────────────────────────────────────────────────────────
-      FITA_GROUP = "ACMFacil — Fita de borda".freeze
+      FITA_GROUP = "SignEng — Fita de borda".freeze
 
       def self.marcar_fitas(quads)
         model = Sketchup.active_model
-        model.start_operation("ACMFacil — Fita de borda", true)
+        model.start_operation("SignEng — Fita de borda", true)
         apagar_grupos_fita(model)
         if quads.nil? || quads.empty?
           model.commit_operation
@@ -358,7 +358,7 @@ module ACMFacil
 
       def self.limpar_fitas
         model = Sketchup.active_model
-        model.start_operation("ACMFacil — limpar fita", true)
+        model.start_operation("SignEng — limpar fita", true)
         k = apagar_grupos_fita(model)
         model.commit_operation
         { ok: true, n: k }
@@ -371,7 +371,7 @@ module ACMFacil
       end
 
       def self.fita_material(model)
-        m = model.materials["ACMFacil_Fita"] || model.materials.add("ACMFacil_Fita")
+        m = model.materials["SignEng_Fita"] || model.materials.add("SignEng_Fita")
         m.color = Sketchup::Color.new(220, 38, 38)
         m.alpha = 1.0
         m
@@ -385,10 +385,10 @@ module ACMFacil
       # fluxo de planificação capturar em seguida.
       # ──────────────────────────────────────────────────────────────────────
       MOVEL_CORES = {
-        "metalon"   => ["ACMFacil_Metalon",   [55, 58, 64]],
-        "pezinho"   => ["ACMFacil_Pezinho",   [25, 25, 27]],
-        "corredica" => ["ACMFacil_Corredica", [150, 153, 158]],
-        "puxador"   => ["ACMFacil_Puxador",   [38, 38, 38]]
+        "metalon"   => ["SignEng_Metalon",   [55, 58, 64]],
+        "pezinho"   => ["SignEng_Pezinho",   [25, 25, 27]],
+        "corredica" => ["SignEng_Corredica", [150, 153, 158]],
+        "puxador"   => ["SignEng_Puxador",   [38, 38, 38]]
       }.freeze
       # Etiquetas (tags) separadas por tipo de peça
       MOVEL_TAGS = {
@@ -414,7 +414,7 @@ module ACMFacil
         cor_tex  = params["cor_tex"].to_s.gsub(/[^0-9a-z\-\.]/, "")
 
         model = Sketchup.active_model
-        model.start_operation("ACMFacil — Móvel Industrial", true)
+        model.start_operation("SignEng — Móvel Industrial", true)
         # REGENERAR: apaga o móvel gerado anterior (ajustou → gera de novo)
         if @mv_grp_id
           antigo = model.find_entity_by_id(@mv_grp_id) rescue nil
@@ -481,7 +481,7 @@ module ACMFacil
           end
 
           nome_mat, rgb = MOVEL_CORES[tipo]
-          nome_mat ||= "ACMFacil_MDF_#{cor_nome}"
+          nome_mat ||= "SignEng_MDF_#{cor_nome}"
           rgb      ||= cor_rgb
           mat = mats[nome_mat] ||= begin
             m = model.materials[nome_mat] || model.materials.add(nome_mat)
@@ -584,7 +584,7 @@ module ACMFacil
 
         abre = 250.mm
         # operação transparente: o arrasto do slider não enche o undo
-        model.start_operation("ACMFacil — móvel interação", true, false, true)
+        model.start_operation("SignEng — móvel interação", true, false, true)
         vivos = 0
         @mv_subs.each do |eid, c, gav_idx|
           ent = model.find_entity_by_id(eid) rescue nil
@@ -608,7 +608,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, result: {} }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         r = Core::FirebaseClient.call_function("movelIndustrialCompute", payload, id_token)
         if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
@@ -626,9 +626,9 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
                 when "INVALID_ARGUMENT"  then r[:error].to_s
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Letra 3D (diálogo da ferramenta)
+   SignEng — Letra 3D (diálogo da ferramenta)
    ══════════════════════════════════════════════════════════════════════════
    Fluxo: Importar SVG → configurar parâmetros → Gerar (componente com
    etiquetas por peça). Carregar selecionado → Regenerar no lugar.
@@ -44,8 +44,8 @@ const Letra3dUI = {
       msgLetras: ' letra(s)',
       msgCarregado: 'Parâmetros carregados — edite e clique Regenerar.',
       msgCarregadoSemSvg: 'Carregado, mas o SVG original não foi encontrado — importe de novo pra regenerar.',
-      msgNadaSel: 'Selecione uma Letra 3D gerada pelo ACMFacil primeiro.',
-      msgBlocked: 'Licença inválida. Faça login no painel do ACMFacil.',
+      msgNadaSel: 'Selecione uma Letra 3D gerada pelo SignEng primeiro.',
+      msgBlocked: 'Licença inválida. Faça login no painel do SignEng.',
       msgError: 'Erro: '
     },
     es: {
@@ -74,8 +74,8 @@ const Letra3dUI = {
       msgLetras: ' letra(s)',
       msgCarregado: 'Parámetros cargados — edita y pulsa Regenerar.',
       msgCarregadoSemSvg: 'Cargado, pero el SVG original no se encontró — impórtalo de nuevo.',
-      msgNadaSel: 'Selecciona primero una Letra 3D generada por ACMFacil.',
-      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de ACMFacil.',
+      msgNadaSel: 'Selecciona primero una Letra 3D generada por SignEng.',
+      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de SignEng.',
       msgError: 'Error: '
     },
     en: {
@@ -104,8 +104,8 @@ const Letra3dUI = {
       msgLetras: ' letter(s)',
       msgCarregado: 'Parameters loaded — edit and click Regenerate.',
       msgCarregadoSemSvg: 'Loaded, but the original SVG was not found — import it again.',
-      msgNadaSel: 'Select an ACMFacil-generated 3D letter first.',
-      msgBlocked: 'Invalid license. Log in on the ACMFacil panel.',
+      msgNadaSel: 'Select an SignEng-generated 3D letter first.',
+      msgBlocked: 'Invalid license. Log in on the SignEng panel.',
       msgError: 'Error: '
     }
   },

@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Bridge JS ↔ Ruby
+   SignEng — Bridge JS ↔ Ruby
    ══════════════════════════════════════════════════════════════════════════
    Toda chamada de JS pra Ruby deve passar por Bridge.call(action, payload).
    Retorna Promise que resolve quando o Ruby chama Bridge._resolve(id, data).
@@ -14,7 +14,7 @@ const Bridge = {
    * @param {string} action — nome do callback (ex: "auth_login")
    * @param {object} payload — dados extras (email, senha, etc)
    * @param {number} timeoutMs — prazo máximo (default 60s: os módulos agora
-   *   calculam no servidor ACMFacil e a 1ª chamada pode pegar cold start +
+   *   calculam no servidor SignEng e a 1ª chamada pode pegar cold start +
    *   rede lenta; o HTTP do Ruby estoura antes, em 45s, com mensagem clara.
    *   Passar maior em operações com savepanel/captura, onde o Ruby espera
    *   o usuário)
