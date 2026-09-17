@@ -80,6 +80,26 @@
     <!-- ═══════════ CONTAINER DAS VIEWS ═════════════════════════════════ -->
     <div class="app__views">
 
+      <section class="view view--auth" data-view="auth" hidden>
+        <div class="auth">
+          <div class="auth__card">
+            <div class="auth__brand">
+              <div class="auth__logo"><img src="assets/images/logo-principal.png" alt="SignEng" width="56" height="56"></div>
+              <h1 class="auth__title">SignEng</h1>
+              <p class="auth__tagline" data-i18n="auth.tagline">Plugin SketchUp para fachadas em ACM</p>
+            </div>
+            <form class="auth__form" id="auth_form" onsubmit="return Auth.handleSubmit(event)">
+              <div class="field"><label class="field__label" for="auth_email" data-i18n="auth.email">Email</label><div class="field__control"><input class="field__input" id="auth_email" type="email" required autocomplete="email"></div></div>
+              <div class="field"><label class="field__label" for="auth_pwd" data-i18n="auth.password">Senha</label><div class="field__control"><input class="field__input" id="auth_pwd" type="password" required autocomplete="current-password"><button type="button" class="field__toggle" onclick="Auth.togglePassword()">Mostrar</button></div></div>
+              <div class="auth__row"><label class="checkbox"><input type="checkbox" id="auth_remember" checked><span class="checkbox__text" data-i18n="auth.remember">Lembrar email</span></label><a href="#" class="auth__link" onclick="Auth.recuperarSenha(event)" data-i18n="auth.recover">Recuperar senha</a></div>
+              <button type="submit" class="btn btn--primary btn--lg btn--block" id="auth_submit"><span data-i18n="auth.submit">Entrar</span></button>
+              <div class="auth__error" id="auth_error" hidden></div>
+            </form>
+            <footer class="auth__footer">SignEng <span class="auth__sep">·</span> <span id="auth_version">1.9.32</span></footer>
+          </div>
+        </div>
+      </section>
+
       <!-- ─────────── VIEW: DASHBOARD ─────────── -->
       <section class="view view--dashboard" data-view="dashboard" hidden>
         <header class="topbar">

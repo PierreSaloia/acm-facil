@@ -20,6 +20,7 @@ module SignEng
   # (build assinado/criptografado pela Trimble). NÃO trocar de volta.
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'version')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'firebase_client')
+  Sketchup::require File.join(PLUGIN_DIR, 'core', 'supabase_client')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'auth')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'cores')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'geometry')

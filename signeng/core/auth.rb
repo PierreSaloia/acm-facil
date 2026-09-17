@@ -37,7 +37,7 @@ module SignEng
   module Core
     module Auth
       DEFAULT_NS = "SignEng".freeze
-      OFFLINE_MODE = true.freeze
+      OFFLINE_MODE = false.freeze
 
       # ── Grace period offline (segundos) ──
       # Erros de rede / Cloud Function indisponível só liberam acesso se
@@ -70,6 +70,16 @@ module SignEng
         return { ok: false, code: "auth.empty_email" }    if email.empty?
         return { ok: false, code: "auth.empty_password" } if pwd.empty?
 
+        res = SupabaseClient.sign_in(email, pwd)
+        if res[:ok]
+          save_supabase_tokens(res)
+          firebase_res = FirebaseClient.sign_in(email, pwd)
+          save_tokens(firebase_res) if firebase_res[:ok]
+          user = build_supabase_user(res[:user], email)
+          return { ok: true, user: user, license: license_for_user(user) }
+        end
+
+        # Compatibilidade temporária com contas ainda existentes no Firebase.
         res = FirebaseClient.sign_in(email, pwd)
 
         if !res[:ok]
@@ -123,6 +133,23 @@ module SignEng
       # ─────────────────────────────────────────────────────────────────────
       def self.validate_session
         return offline_user_session if OFFLINE_MODE
+
+        access_token = Sketchup.read_default(DEFAULT_NS, "sb_access_token", "").to_s
+        refresh_token = Sketchup.read_default(DEFAULT_NS, "sb_refresh_token", "").to_s
+        if !access_token.empty?
+          current = SupabaseClient.user(access_token)
+          unless current[:ok] || refresh_token.empty?
+            refreshed = SupabaseClient.refresh_session(refresh_token)
+            if refreshed[:ok]
+              save_supabase_tokens(refreshed)
+              current = { ok: true, user: refreshed[:user] }
+            end
+          end
+          if current[:ok]
+            user = build_supabase_user(current[:user], current[:user]["email"])
+            return { ok: true, user: user, license: license_for_user(user) }
+          end
+        end
 
         id_token      = Sketchup.read_default(DEFAULT_NS, "fb_id_token",      "").to_s
         refresh_token = Sketchup.read_default(DEFAULT_NS, "fb_refresh_token", "").to_s
@@ -186,6 +213,13 @@ module SignEng
       # ─────────────────────────────────────────────────────────────────────
       def self.assert_valid!(force_recheck = false)
         return { ok: true, code: "offline.mode" } if OFFLINE_MODE
+
+        access_token = Sketchup.read_default(DEFAULT_NS, "sb_access_token", "").to_s
+        if !access_token.empty?
+          current = SupabaseClient.user(access_token)
+          return { ok: true, code: "supabase.authenticated" } if current[:ok]
+          return { ok: false, code: "session.invalid", error: "Sessão inválida. Entre novamente.", blocked: true }
+        end
 
         id_token   = Sketchup.read_default(DEFAULT_NS, "fb_id_token",   "").to_s
         local_id   = Sketchup.read_default(DEFAULT_NS, "fb_local_id",   "").to_s
@@ -317,7 +351,38 @@ module SignEng
            cached_trial_ends_at].each do |k|
           Sketchup.write_default(DEFAULT_NS, k, "")
         end
+        token = Sketchup.read_default(DEFAULT_NS, "sb_access_token", "").to_s
+        SupabaseClient.sign_out(token) unless token.empty?
+        Sketchup.write_default(DEFAULT_NS, "sb_access_token", "")
+        Sketchup.write_default(DEFAULT_NS, "sb_refresh_token", "")
         # NÃO limpa session_email/last_email pra pré-preencher na próxima
+      end
+
+      def self.save_supabase_tokens(res)
+        now = Time.now.to_i
+        Sketchup.write_default(DEFAULT_NS, "sb_access_token", res[:access_token].to_s)
+        Sketchup.write_default(DEFAULT_NS, "sb_refresh_token", res[:refresh_token].to_s)
+        Sketchup.write_default(DEFAULT_NS, "sb_expires_at", (now + res[:expires_in].to_i).to_s)
+        Sketchup.write_default(DEFAULT_NS, "session_email", res[:user]["email"].to_s)
+      end
+
+      def self.build_supabase_user(raw, email = nil)
+        metadata = raw.is_a?(Hash) ? (raw["user_metadata"] || {}) : {}
+        normalized = (email || raw["email"] || "").to_s.downcase
+        admin = normalized == MASTER_EMAIL
+        {
+          local_id: raw["id"] || raw["sub"],
+          email: normalized,
+          nome: metadata["name"] || (admin ? MASTER_NAME : normalized.split("@").first),
+          role: admin ? "admin" : "user",
+          status: "active",
+          modules: all_modules
+        }
+      end
+
+      def self.license_for_user(user)
+        return build_master_license if user[:role] == "admin"
+        build_default_trial
       end
 
       def self.offline_user_session

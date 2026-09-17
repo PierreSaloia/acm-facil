@@ -29,31 +29,18 @@ const App = {
       }
     } catch (e) { /* ignora */ }
 
-    // Modo local/offline: não depende de sessão online nem de login.
-    // O app abre diretamente no painel de módulos.
-    const offlineUser = {
-      local_id: 'offline-local-user',
-      email: 'offline@local',
-      nome: 'Local',
-      role: 'admin',
-      status: 'active',
-      modules: ['auto_acm', 'auto_acm_curvo', 'auto_sigame', 'textura_sync', 'logo3d', 'planifica', 'corte_encaixe']
-    };
-    const offlineLicense = {
-      plan: 'admin',
-      status: 'active',
-      paid: true,
-      expires_at: null,
-      days_left: 99999,
-      max_machines: 999
-    };
-
-    Auth.state.user = offlineUser;
-    Auth.state.license = offlineLicense;
-    Auth._updateUserChrome(offlineUser, offlineLicense);
-    await App.gotoStart();
-    setTimeout(() => App.checkUpdate(), 1500);
-    return;
+    try {
+      const session = await Bridge.call('auth_validate_session');
+      if (session && session.ok) {
+        Auth.state.user = session.user;
+        Auth.state.license = session.license || null;
+        Auth._updateUserChrome(session.user, session.license);
+        await App.gotoStart();
+        setTimeout(() => App.checkUpdate(), 1500);
+        return;
+      }
+    } catch (e) { console.warn('Sessão online indisponível:', e); }
+    Router.goto('auth');
   },
 
   /**

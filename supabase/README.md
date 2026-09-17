@@ -12,4 +12,18 @@ A migração inicial está em `migrations/001_signeng_initial.sql`.
 
 A chave `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` não pode criar tabelas. Ela é usada somente para acesso público permitido pelas políticas RLS.
 
-O login permanece desativado. As tabelas `companies` e `presets` usam `installation_id` temporariamente; quando o login for ativado, as políticas deverão ser trocadas para `auth.uid()`.
+## Criar o administrador
+
+No Supabase Dashboard, abra **Authentication > Users > Add user** e crie:
+
+- Email: `pierreprincipal@gmail.com`
+- Nome/metadata `name`: `Pierre Santos de Aquino`
+- Marque confirmação automática do email durante os testes.
+
+A senha deve ser digitada diretamente no painel do Supabase e não deve ser salva no repositório, `.env` ou código.
+
+O trigger da migração `002_auth_profiles.sql` cria automaticamente o perfil admin e a licença vitalícia para esse email.
+
+## Cálculos dos módulos
+
+O login novo usa Supabase Auth. Os cálculos ainda mantêm compatibilidade temporária com as Cloud Functions Firebase antigas: quando a mesma conta também existir no Firebase, o plugin salva o token Firebase para os módulos legados. Para migrar totalmente para Supabase, cada Cloud Function de cálculo deverá ser portada para uma Supabase Edge Function mantendo o contrato de cada módulo.
