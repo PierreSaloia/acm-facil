@@ -224,10 +224,12 @@ const Dashboard = {
   },
 
   // Abre a página de upgrade no navegador
+  // TODO(SignEng): sem domínio/painel novo ainda — assim que existir,
+  // trocar a URL abaixo (infraestrutura antiga desativada de propósito).
   openUpgrade() {
-    Bridge.call('app_open_url', {
-      url: 'https://acmfacil-d876c.web.app/painel'
-    }).catch(() => {});
+    if (typeof Toast !== 'undefined') {
+      Toast.info(I18n.t('lic.upgrade.soon', 'Painel de assinatura em breve.'));
+    }
   }
 };
 

@@ -216,7 +216,7 @@ module SignEng
             end
           end
         rescue; end
-        seed = "#{hostname}|#{user}|#{os}|#{vol}|acmfacil"
+        seed = "#{hostname}|#{user}|#{os}|#{vol}|signeng"
         Digest::SHA256.hexdigest(seed)[0, 32]
       end
 

@@ -249,7 +249,7 @@ module SignEng
             # converter os cantos das peças desenhadas pro mesmo espaço mm-local
             # do envelope/pecas_3d (preview = SketchUp, sem re-derivação).
             begin
-              grp.set_attribute("acmfacil_curvo", "local_min",
+              grp.set_attribute("signeng_curvo", "local_min",
                                 [ox_in.to_f, oy_in.to_f, oz_in.to_f])
             rescue => _e
             end
@@ -551,23 +551,23 @@ module SignEng
         # erased faces ACM desabilitadas (que faria uma 2ª chamada a
         # analisar_modulo retornar nil por faces.size < 4).
         begin
-          grp.set_attribute("acmfacil_curvo", "base_corners",
+          grp.set_attribute("signeng_curvo", "base_corners",
                             base_corners.map { |p| [p.x.to_f, p.y.to_f, p.z.to_f] })
-          grp.set_attribute("acmfacil_curvo", "topo_corners",
+          grp.set_attribute("signeng_curvo", "topo_corners",
                             topo_corners.map { |p| [p.x.to_f, p.y.to_f, p.z.to_f] })
-          grp.set_attribute("acmfacil_curvo", "facets_meta",
+          grp.set_attribute("signeng_curvo", "facets_meta",
                             facets.map { |fc| { "role" => fc[:role].to_s, "idx_in_role" => fc[:idx_in_role].to_i } })
           # Polígono real de cada faceta (merged_polygon multi-segmento ou
           # outer_loop) — permite reconstruir as trajetórias dos cantos no
           # adicionar_peca pra a travessa acompanhar a curva (igual ao gerar).
-          grp.set_attribute("acmfacil_curvo", "facets_poly",
+          grp.set_attribute("signeng_curvo", "facets_poly",
                             facets.map { |fc|
                               poly = poly_for_facet(fc)
                               (poly && poly.size >= 3) ? poly.map { |p| [p.x.to_f, p.y.to_f, p.z.to_f] } : []
                             })
-          grp.set_attribute("acmfacil_curvo", "bb_topo",
+          grp.set_attribute("signeng_curvo", "bb_topo",
                             [bb_topo[:cx].to_f, bb_topo[:cy].to_f, bb_topo[:w].to_f, bb_topo[:d].to_f])
-          grp.set_attribute("acmfacil_curvo", "bb_base",
+          grp.set_attribute("signeng_curvo", "bb_base",
                             [bb_base[:cx].to_f, bb_base[:cy].to_f, bb_base[:w].to_f, bb_base[:d].to_f])
         rescue => _e
         end
@@ -592,16 +592,16 @@ module SignEng
       # já foi modificado por gerar() (faces ACM desabilitadas erased), o que
       # faria analisar_modulo retornar nil.
       def self.restaurar_info_de_attributes(grp)
-        base_raw = grp.get_attribute("acmfacil_curvo", "base_corners", nil)
-        topo_raw = grp.get_attribute("acmfacil_curvo", "topo_corners", nil)
-        meta_raw = grp.get_attribute("acmfacil_curvo", "facets_meta", nil)
+        base_raw = grp.get_attribute("signeng_curvo", "base_corners", nil)
+        topo_raw = grp.get_attribute("signeng_curvo", "topo_corners", nil)
+        meta_raw = grp.get_attribute("signeng_curvo", "facets_meta", nil)
         return nil unless base_raw && topo_raw && meta_raw
         return nil if base_raw.size != topo_raw.size
         return nil if base_raw.size < 3
 
         base_corners = base_raw.map { |a| Geom::Point3d.new(a[0].to_f, a[1].to_f, a[2].to_f) }
         topo_corners = topo_raw.map { |a| Geom::Point3d.new(a[0].to_f, a[1].to_f, a[2].to_f) }
-        poly_raw = grp.get_attribute("acmfacil_curvo", "facets_poly", nil)
+        poly_raw = grp.get_attribute("signeng_curvo", "facets_poly", nil)
 
         n = base_corners.size
         facets = []

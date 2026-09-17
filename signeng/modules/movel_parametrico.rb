@@ -12,7 +12,7 @@
 # no lado configurado. Tudo etiquetado (MP - ...) e componentizado.
 #
 # O resultado nasce como COMPONENTE com params + persistent_id do bloco de
-# origem gravados em attribute dictionary ('acmfacil_movel_parametrico') —
+# origem gravados em attribute dictionary ('signeng_movel_parametrico') —
 # dá pra selecionar um já gerado, carregar no painel, editar e REGENERAR no
 # lugar (re-fatia o bloco original, que fica oculto no modelo).
 # ═══════════════════════════════════════════════════════════════════════════
@@ -21,7 +21,7 @@ module SignEng
   module Generator
     module MovelParametrico
 
-      DICT = 'acmfacil_movel_parametrico'
+      DICT = 'signeng_movel_parametrico'
 
       @dialog = nil
 
@@ -37,7 +37,7 @@ module SignEng
         end
         @dialog = UI::HtmlDialog.new(
           dialog_title:    "SignEng — Móvel Paramétrico",
-          preferences_key: "com.acmfacil.movel_parametrico",
+          preferences_key: "com.signeng.movel_parametrico",
           width:           440,
           height:          760,
           min_width:       400,

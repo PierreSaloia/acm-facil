@@ -42,7 +42,7 @@ module SignEng
 
         @dialog = UI::HtmlDialog.new(
           dialog_title:    "SignEng — Alinhar",
-          preferences_key: "com.acmfacil.alinhar",
+          preferences_key: "com.signeng.alinhar",
           width:           380,
           height:          680,
           min_width:       340,

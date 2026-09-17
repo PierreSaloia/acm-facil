@@ -71,7 +71,7 @@ window.AutoAcmCurvo = {
   // ESPESSURA DE FITA — presets + medidas custom salvas no PC
   // ══════════════════════════════════════════════════════════════════
 
-  _FITA_ESP_KEY: 'acmfacil_fita_esp_custom',
+  _FITA_ESP_KEY: 'signeng_fita_esp_custom',
   _FITA_ESP_PRESET: [0.5, 0.9, 1.2, 1.6],
 
   /** Reinsere no select as espessuras custom salvas em localStorage. */
@@ -689,7 +689,7 @@ window.AutoAcmCurvo = {
   // CORES DE JUNTA CUSTOM — paleta + seletor livre, salvas no PC
   // ══════════════════════════════════════════════════════════════════
 
-  _JUNTA_CORES_KEY: 'acmfacil_junta_cores_custom',
+  _JUNTA_CORES_KEY: 'signeng_junta_cores_custom',
 
   _JUNTA_PALETTE: [
     { nome: 'Vermelho',     hex: '#c0392b' }, { nome: 'Laranja',     hex: '#e67e22' },

@@ -21,7 +21,7 @@ window.AutoSigame = {
               dragging: false, lastX: 0, lastY: 0 }
   },
 
-  _JUNTA_CORES_KEY: 'acmfacil_asg_junta_cores_custom',
+  _JUNTA_CORES_KEY: 'signeng_asg_junta_cores_custom',
 
   init() {
     AutoSigame.loadCores();

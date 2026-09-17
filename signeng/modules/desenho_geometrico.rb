@@ -33,7 +33,7 @@ module SignEng
         end
         @dialog = UI::HtmlDialog.new(
           dialog_title:    "SignEng — Desenho Geométrico",
-          preferences_key: "com.acmfacil.geoart",
+          preferences_key: "com.signeng.geoart",
           width:           460,
           height:          760,
           min_width:       400,

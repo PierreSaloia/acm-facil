@@ -8,7 +8,7 @@
 # parede, chapa interna, parafusos e folgas configuráveis.
 #
 # O luminoso nasce como COMPONENTE com os params gravados em attribute
-# dictionary ('acmfacil_luminoso') — dá pra selecionar um já gerado, carregar
+# dictionary ('signeng_luminoso') — dá pra selecionar um já gerado, carregar
 # os valores no painel, editar e REGENERAR NO LUGAR (preserva a posição).
 #
 # Orientação de construção: frente = -Y (convenção de fachada do plugin),
@@ -20,7 +20,7 @@ module SignEng
   module Generator
     module Luminoso
 
-      DICT = 'acmfacil_luminoso'
+      DICT = 'signeng_luminoso'
       TAU  = Math::PI * 2
 
       @dialog = nil
@@ -38,7 +38,7 @@ module SignEng
 
         @dialog = UI::HtmlDialog.new(
           dialog_title:    "SignEng — Luminoso",
-          preferences_key: "com.acmfacil.luminoso",
+          preferences_key: "com.signeng.luminoso",
           width:           440,
           height:          760,
           min_width:       400,
@@ -1040,7 +1040,7 @@ module SignEng
             view.refresh rescue nil
             # JPG comprimido: 5 PNGs grandes estouravam o execute_script do
             # Bridge (resolver silenciosamente falhava) — JPG fica ~10x menor
-            path = File.join(tmpdir, "acmfacil_lum_#{nome}.jpg")
+            path = File.join(tmpdir, "signeng_lum_#{nome}.jpg")
             view.write_image(path, 640, 480, true, 0.6)
             if File.exist?(path)
               out[nome] = "data:image/jpeg;base64,#{Base64.strict_encode64(File.binread(path))}"

@@ -12,7 +12,7 @@
 # Offsets derivados (modelo de referência do Marcelo):
 #   acrílico = parede_ext · interno = parede_ext+folga_int · fundo = +parede_int
 # Reusa o motor do Logo 3D: parse de SVG (furos even-odd) + offset de loops.
-# Nasce como COMPONENTE com params em dict ('acmfacil_letra3d') — Carregar
+# Nasce como COMPONENTE com params em dict ('signeng_letra3d') — Carregar
 # selecionado → Regenerar no lugar. Cada peça etiquetada (LT3D - ...).
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -20,15 +20,15 @@ module SignEng
   module Generator
     module Letra3d
 
-      DICT = 'acmfacil_letra3d'
+      DICT = 'signeng_letra3d'
 
       @dialog   = nil
       @svg_path = nil
       @log      = []
 
-      # ── Log de diagnóstico (grava em Documents\acmfacil_letra3d_debug.log
+      # ── Log de diagnóstico (grava em Documents\signeng_letra3d_debug.log
       # a cada Gerar — pra depurar sem depender do Ruby Console) ────────────
-      LOG_PATH = File.join(ENV['USERPROFILE'].to_s, 'Documents', 'acmfacil_letra3d_debug.log')
+      LOG_PATH = File.join(ENV['USERPROFILE'].to_s, 'Documents', 'signeng_letra3d_debug.log')
 
       def self.dlog(msg)
         @log << msg
@@ -52,7 +52,7 @@ module SignEng
         end
         @dialog = UI::HtmlDialog.new(
           dialog_title:    "SignEng — Letra 3D",
-          preferences_key: "com.acmfacil.letra3d",
+          preferences_key: "com.signeng.letra3d",
           width:           430,
           height:          720,
           min_width:       390,

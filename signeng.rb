@@ -12,7 +12,7 @@ module SignEng
   unless file_loaded?(__FILE__)
     ext = SketchupExtension.new(
       "SignEng",
-      File.join(File.dirname(__FILE__), "acmfacil", "main")
+      File.join(File.dirname(__FILE__), "signeng", "main")
     )
     ext.version     = "1.9.32"
     ext.creator     = "SignEng"
