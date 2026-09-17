@@ -15,8 +15,8 @@ module SignEng
       File.join(File.dirname(__FILE__), "signeng", "main")
     )
     ext.version     = "1.9.32"
-    ext.creator     = "Marcelo Para Oficial"
-    ext.copyright   = "© 2026 Marcelo Para Oficial"
+    ext.creator     = "Pierre Santos de Aquino"
+    ext.copyright   = "© 2026 Pierre Santos de Aquino"
     ext.description = "Plugin para geração paramétrica de fachadas em ACM. " \
                       "Suporta múltiplos módulos geradores (marquise, colunas, " \
                       "auto-ACM, corte CNC e mais) com design moderno e fluxo " \

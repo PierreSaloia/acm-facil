@@ -226,7 +226,7 @@ const Dashboard = {
   // Abre a página de upgrade no navegador
   openUpgrade() {
     Bridge.call('app_open_url', {
-      url: 'https://signeng-d876c.web.app/painel'
+      url: 'https://signeng.online/painel'
     }).catch(() => {});
   }
 };

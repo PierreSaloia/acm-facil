@@ -1641,7 +1641,7 @@ module SignEng
     cmd_luminoso.large_icon      = File.join(ICONS_DIR, 'luminoso_32.svg')
     toolbar.add_item(cmd_luminoso)
 
-    # LETRA 3D — módulo PAUSADO (2026-07-12, pedido do Marcelo): botão oculto
+    # LETRA 3D — módulo PAUSADO: botão oculto
     # da toolbar até retomarmos. Pra reativar, descomentar o bloco abaixo.
     # Estado da depuração: docs/SESSION_LOG.md (v1.8.78→v1.8.80).
     # cmd_letra3d = UI::Command.new("SignEng — Letra 3D") { SignEng::Generator::Letra3d.ativar }
@@ -1652,7 +1652,7 @@ module SignEng
     # toolbar.add_item(cmd_letra3d)
 
     # DESENHO GEOMÉTRICO — Fase 1, OCULTO na release pública (2026-07-24,
-    # pedido do Marcelo): sai da toolbar até o lançamento oficial.
+    # sai da toolbar até o lançamento oficial.
     # Pra reativar (teste interno), descomentar o bloco abaixo.
     # cmd_geoart = UI::Command.new("SignEng — Desenho Geométrico") { SignEng::Generator::GeoArt.ativar }
     # cmd_geoart.tooltip         = "Desenho Geométrico — foto vira mosaico low-poly em ACM"

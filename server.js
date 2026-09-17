@@ -1,9 +1,16 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createClient } from '@supabase/supabase-js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const SITE_URL = process.env.SIGNENG_SITE_URL || 'https://signeng.online';
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || '';
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
+  : null;
 
 const app = express();
 app.use(express.json());
@@ -12,7 +19,13 @@ app.use(express.json());
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 app.post('/api/app_info', (req, res) => {
-  res.json({ ok: true, version: '1.5.0' });
+  res.json({ ok: true, version: '1.5.0', site_url: SITE_URL, online: !!supabase });
+});
+
+app.get('/config.js', (req, res) => {
+  res.type('application/javascript').send(
+    `window.SignEngConfig = ${JSON.stringify({ siteUrl: SITE_URL, supabaseEnabled: !!supabase })};`
+  );
 });
 
 app.post('/api/theme_get', (req, res) => {
@@ -46,7 +59,7 @@ app.post('/api/ui_pending_module', (req, res) => {
 app.post('/api/ui_load_module', async (req, res) => {
   try {
     const { name } = req.body;
-    const modDir = path.join(__dirname, 'acmfacil', 'ui', 'modules', name);
+    const modDir = path.join(__dirname, 'signeng', 'ui', 'modules', name);
     
     let html = '';
     let css = '';
@@ -91,6 +104,12 @@ app.post('/api/auth_login', (req, res) => {
   });
 });
 
+// O modo público não cria sessão nem exige login. Este endpoint só expõe o
+// estado da conexão para sincronização futura com tabelas públicas.
+app.get('/api/online_status', (req, res) => {
+  res.json({ ok: true, site_url: SITE_URL, supabase: !!supabase, login_required: false });
+});
+
 app.post('/api/auth_saved_email', (req, res) => {
   res.json({ ok: true });
 });
@@ -108,10 +127,10 @@ app.post('/api/:action', async (req, res) => {
 
 
 // ─────────── STATIC FILES ───────────
-app.use(express.static(path.join(__dirname, 'acmfacil', 'ui')));
+app.use(express.static(path.join(__dirname, 'signeng', 'ui')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'acmfacil', 'ui', 'index.html'));
+  res.sendFile(path.join(__dirname, 'signeng', 'ui', 'index.html'));
 });
 
 const PORT = 3000;

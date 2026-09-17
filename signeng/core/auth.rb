@@ -53,8 +53,8 @@ module SignEng
       # pra o grace offline de 24h.
 
       # ── Fallback offline (emergência) ──
-      MASTER_EMAIL    = "marcelo.para.oficial@gmail.com".freeze
-      MASTER_NAME     = "Marcelo Para Oficial".freeze
+      MASTER_EMAIL    = "pierreprincipal@gmail.com".freeze
+      MASTER_NAME     = "Pierre Santos de Aquino".freeze
       SALT            = "signeng_salt_v1_2026".freeze
       MASTER_FALLBACK = Digest::SHA256.hexdigest("Master@332025" + SALT).freeze
 
