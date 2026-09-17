@@ -28,10 +28,9 @@ module SignEng
       # ────────── CONFIG PÚBLICA ──────────
       # Essas chaves NÃO são secretas. O que protege o sistema são as
       # security rules do Firestore + domain allowlist do Auth.
-      API_KEY    = "AIzaSyB58yYBeY7WMaQuFzIOe2GBZO_cZiue7vQ".freeze
-      # O projeto foi renomeado visualmente para SignEng, mas as Cloud
-      # Functions antigas continuam publicadas no projeto Firebase original.
-      PROJECT_ID = "acmfacil-d876c".freeze
+      API_KEY    = FirebaseConfig::API_KEY.freeze
+      PROJECT_ID = FirebaseConfig::PROJECT_ID.freeze
+      REGION     = FirebaseConfig::REGION.freeze
 
       AUTH_BASE = "https://identitytoolkit.googleapis.com/v1".freeze
       FS_BASE   = "https://firestore.googleapis.com/v1/projects/#{PROJECT_ID}/databases/(default)/documents".freeze
@@ -48,6 +47,7 @@ module SignEng
       # Returns: {ok: true, idToken, refreshToken, localId, email, expiresIn}
       #       OR {ok: false, code: "auth.xxx", error: "raw error"}
       def self.sign_in(email, password)
+        return { ok: false, code: "firebase.not_configured", error: "Configure o novo Firebase do SignEng." } unless FirebaseConfig.configured?
         url = URI("#{AUTH_BASE}/accounts:signInWithPassword?key=#{API_KEY}")
         body = {
           email: email.to_s.strip.downcase,
@@ -231,6 +231,8 @@ module SignEng
       #
       # Retorna { ok: true, result } OU { ok: false, code, error, details }
       def self.call_function(name, data, id_token, region = "us-central1", timeout = TIMEOUT_SEC)
+        return { ok: false, code: "firebase.not_configured", error: "Configure o novo Firebase do SignEng." } unless FirebaseConfig.configured?
+        region = REGION if region.to_s == "us-central1"
         url = URI("https://#{region}-#{PROJECT_ID}.cloudfunctions.net/#{name}")
         req = Net::HTTP::Post.new(url)
         req["Authorization"] = "Bearer #{id_token}"

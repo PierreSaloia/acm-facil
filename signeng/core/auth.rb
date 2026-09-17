@@ -70,8 +70,7 @@ module SignEng
         return { ok: false, code: "auth.empty_email" }    if email.empty?
         return { ok: false, code: "auth.empty_password" } if pwd.empty?
 
-        # Firebase Auth continua sendo a autenticação principal porque as
-        # Cloud Functions legadas validam Firebase ID tokens.
+        # Firebase Auth será a autenticação principal do backend novo.
         res = FirebaseClient.sign_in(email, pwd)
 
         if res[:ok]

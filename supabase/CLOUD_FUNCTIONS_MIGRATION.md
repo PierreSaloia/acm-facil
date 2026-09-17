@@ -1,10 +1,10 @@
-# Conectar as Cloud Functions antigas
+# Backend novo do SignEng
 
-## Funcoes usadas pelo SignEng
+O SignEng foi separado do backend anterior. O cliente Firebase agora lê a configuração em `signeng/core/firebase_config.rb` e não aponta para nenhum projeto antigo.
 
-O cliente Ruby chama estas funcoes no projeto Firebase original `acmfacil-d876c`.
-O nome visual do plugin mudou para SignEng, mas nao se deve renomear o projeto
-Firebase enquanto as funcoes antigas estiverem em uso.
+## Funções novas
+
+O novo backend deverá fornecer estas funções:
 
 - `autoAcmCompute`
 - `autoAcmCurvoCompute`
@@ -20,73 +20,70 @@ Firebase enquanto as funcoes antigas estiverem em uso.
 - `alinharCompute`
 - `verifyMachineLicense`
 
-A URL usada pelo plugin e:
+As URLs serão geradas automaticamente pelo cliente:
 
 ```text
-https://us-central1-acmfacil-d876c.cloudfunctions.net/NOME_DA_FUNCAO
+https://REGION-NOVO_PROJECT_ID.cloudfunctions.net/NOME_DA_FUNCAO
 ```
 
-## O que ja esta conectado
+## Configurar o novo Firebase
 
-- Login principal: Firebase Auth, porque as funcoes exigem Firebase ID token.
-- Perfil complementar: Supabase Auth/tabelas quando a mesma conta existir nos dois projetos.
-- Perfil e licenca: tabelas `users` e `licenses` do Supabase.
-- Compatibilidade legada: depois do login Supabase, o plugin tenta obter tambem um Firebase ID token com as mesmas credenciais.
-- Calculo legado: continua usando `FirebaseClient.call_function` quando existe Firebase ID token.
+1. Crie um novo projeto no Firebase Console.
+2. Ative Authentication com Email/Password.
+3. Ative Cloud Functions.
+4. Registre um app Web e copie o `projectId` e a API key pública.
+5. Preencha `signeng/core/firebase_config.rb`:
 
-## O que falta
+```ruby
+PROJECT_ID = "seu-novo-project-id".freeze
+API_KEY = "sua-nova-api-key-web".freeze
+REGION = "us-central1".freeze
+```
 
-O codigo-fonte das Cloud Functions nao esta neste repositorio. Sem ele nao e possivel fazer deploy ou reconstruir fielmente os calculos.
-
-Tambem e necessario que a conta usada no SignEng exista no Firebase Auth antigo. Um token Supabase nao e aceito automaticamente pelas Cloud Functions Firebase antigas.
-
-## Caminho A: manter as Cloud Functions antigas
-
-1. Recuperar o repositorio ou backup que contem `functions/`, `package.json` e `firebase.json`.
-2. Instalar o Firebase CLI.
-3. Fazer login:
+6. Crie um diretório separado para as funções novas, com `firebase.json` e `functions/`.
+7. Instale o Firebase CLI e faça login:
 
 ```powershell
+npm install -g firebase-tools
 firebase login
+firebase use seu-novo-project-id
 ```
 
-4. Selecionar o projeto antigo:
-
-```powershell
-firebase use signeng-d876c
-```
-
-5. Instalar dependencias dentro de `functions`:
+8. Dentro de `functions`, instale as dependências e publique:
 
 ```powershell
 npm install
+firebase deploy --only functions
 ```
 
-6. Verificar os nomes exportados no `functions/index.js` ou `functions/src/index.ts`.
-7. Fazer deploy apenas das funcoes de calculo:
+## Contrato das funções
 
-```powershell
-firebase deploy --only functions:autoAcmCompute,functions:autoAcmCurvoCompute,functions:autoSigameCompute,functions:corteEncaixeCompute,functions:geoArt3D,functions:geoArtCompute,functions:logo3dCompute,functions:luminosoCompute,functions:movelParametricoCompute,functions:movelIndustrialCompute,functions:texturaSyncCompute,functions:alinharCompute
+Cada função deve aceitar o envelope callable:
+
+```json
+{
+  "data": {}
+}
 ```
 
-8. Confirmar que as regras e o `verifyMachineLicense` continuam publicados.
+E retornar:
 
-## Caminho B: migrar para Supabase Edge Functions
-
-Cada funcao Firebase deve virar uma Edge Function Supabase com o mesmo contrato de entrada e saida. Os modulos Ruby nao devem receber uma lista vazia como fallback: devem chamar a funcao online e exibir erro quando ela estiver indisponivel.
-
-Exemplo de nomes:
-
-```text
-/functions/v1/auto-acm-compute
-/functions/v1/auto-acm-curvo-compute
-/functions/v1/auto-sigame-compute
+```json
+{
+  "result": {}
+}
 ```
 
-A migracao exige transportar o algoritmo real de cada Cloud Function. Criar apenas tabelas SQL nao substitui esses calculos.
+A função deve validar o Firebase ID token enviado no header `Authorization`.
+Os contratos detalhados de `data` e `result` devem ser portados dos algoritmos da versão anterior ou reimplementados para o novo produto.
 
-## Nao fazer
+## Supabase
 
-- Nao colocar `service_role` no plugin ou no GitHub.
-- Nao tentar criar/deployar funcoes usando a chave `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
-- Nao considerar `server.js` atual como backend de producao: ele ainda contem respostas mock para preview.
+O Supabase continua responsável por dados novos como perfis, licenças, configurações e presets. Ele não substitui automaticamente os cálculos geométricos das funções. Esses cálculos precisam existir nas novas Cloud Functions ou em novas Supabase Edge Functions.
+
+## Segurança
+
+- Não colocar `service_role` no plugin ou no GitHub.
+- Não colocar senhas no código, `.env` ou migrações.
+- A API key web do Firebase pode ser pública; as regras e o Firebase Auth protegem os dados.
+- Não reutilizar IDs, API keys, regras ou endpoints do backend anterior.

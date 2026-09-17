@@ -19,6 +19,7 @@ module SignEng
   # Sketchup::require (não `require`): carrega tanto .rb (dev) quanto .rbe
   # (build assinado/criptografado pela Trimble). NÃO trocar de volta.
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'version')
+  Sketchup::require File.join(PLUGIN_DIR, 'core', 'firebase_config')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'firebase_client')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'supabase_client')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'auth')
