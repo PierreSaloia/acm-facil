@@ -10,7 +10,7 @@
 # aneis horizontais segmentados, travessas H, emendas, juntas, fita.
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
     module AutoACMCurvo
 

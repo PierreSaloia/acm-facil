@@ -20,7 +20,7 @@
 #      partir dos subpaths devolvidos pelo servidor no carregamento
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
     module Logo3D
 

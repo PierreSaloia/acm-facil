@@ -9,7 +9,7 @@
 # a partir do layout já calculado pelo JS.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module Planifica
 
@@ -488,7 +488,7 @@ module ACMFacil
             m.color = Sketchup::Color.new(*rgb)
             # MDF com TEXTURA real (madeirados) — o Enscape renderiza o veio
             if MOVEL_CORES[tipo].nil? && !cor_tex.empty?
-              tex_path = File.join(ACMFacil::PLUGIN_DIR, "resources", "mdf_textures", cor_tex)
+              tex_path = File.join(SignEng::PLUGIN_DIR, "resources", "mdf_textures", cor_tex)
               if File.exist?(tex_path)
                 m.texture = tex_path
                 begin

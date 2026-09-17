@@ -5,7 +5,7 @@
 # preenche com estrutura ACM completa (metalon, ACM, fita, juntas, spots).
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
     module AutoACM
 
@@ -1233,7 +1233,7 @@ module ACMFacil
           # FIX 1.0.24: era ACMFacade::Generator (namespace do legado),
           # silenciado por rescue nil → info virava nil, rgb caia no fallback
           # vermelho [180,0,0] e o material METALICO/VX nunca era resolvido.
-          info = ACMFacil::Generator::CORES_ACM[p[:cor_acm]] rescue nil
+          info = SignEng::Generator::CORES_ACM[p[:cor_acm]] rescue nil
           rgb = info ? info[:rgb] : [187,187,187]
           acm_mat = Generator.load_acm_material(model, acm_mat_name, p[:cor_acm].to_s, rgb)
         end

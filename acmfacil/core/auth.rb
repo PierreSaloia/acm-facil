@@ -1,9 +1,8 @@
 # encoding: UTF-8
-require 'digest'
 require 'time'
 
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil::Core::Auth
+# SignEng::Core::Auth
 # ═══════════════════════════════════════════════════════════════════════════
 # Autenticação via Firebase Auth REST + sessão persistente via idToken.
 #
@@ -28,12 +27,9 @@ require 'time'
 #        → fail-CLOSED com grace de 24h offline.
 #
 #   4. destroy_session → limpa tokens, mantém last_email pra UX
-#
-# Fallback: se Firebase estiver OFFLINE e o email for o master hardcoded,
-# permite login local. Garante que eu nunca fique trancado fora do plugin.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Core
     module Auth
       DEFAULT_NS = "SignEng".freeze
@@ -52,12 +48,6 @@ module ACMFacil
       # de garantia >> economia. last_validated_at continua sendo salvo
       # pra o grace offline de 24h.
 
-      # ── Fallback offline (emergência) ──
-      MASTER_EMAIL    = "marcelo.para.oficial@gmail.com".freeze
-      MASTER_NAME     = "Marcelo Para Oficial".freeze
-      SALT            = "acmfacil_salt_v1_2026".freeze
-      MASTER_FALLBACK = Digest::SHA256.hexdigest("Master@332025" + SALT).freeze
-
       # ─────────────────────────────────────────────────────────────────────
       # login(email, pwd) → { ok, user, license } OR { ok: false, code }
       # ─────────────────────────────────────────────────────────────────────
@@ -72,20 +62,7 @@ module ACMFacil
 
         res = FirebaseClient.sign_in(email, pwd)
 
-        if !res[:ok]
-          # Firebase offline? Fallback pro master
-          if res[:code] == "network.error" && email == MASTER_EMAIL &&
-             Digest::SHA256.hexdigest(pwd + SALT) == MASTER_FALLBACK
-            puts "[ACMFacil::Auth] Firebase offline — fallback local pro master"
-            return {
-              ok: true,
-              user: build_master_fallback_user,
-              license: build_master_license,
-              offline: true
-            }
-          end
-          return { ok: false, code: res[:code], error: res[:error] }
-        end
+        return { ok: false, code: res[:code], error: res[:error] } unless res[:ok]
 
         save_tokens(res)
 
@@ -113,7 +90,7 @@ module ACMFacil
           license: license_res[:license]
         }
       rescue => e
-        puts "[ACMFacil::Auth] login exception: #{e.message}"
+        puts "[SignEng::Auth] login exception: #{e.message}"
         puts e.backtrace.first(5).join("\n")
         { ok: false, code: "auth.exception", error: e.message }
       end
@@ -165,7 +142,7 @@ module ACMFacil
           license: license_res[:license]
         }
       rescue => e
-        puts "[ACMFacil::Auth] validate_session exception: #{e.message}"
+        puts "[SignEng::Auth] validate_session exception: #{e.message}"
         { ok: false, code: "session.exception", error: e.message }
       end
 
@@ -241,7 +218,7 @@ module ACMFacil
 
         { ok: true, code: "assert.fresh" }
       rescue => e
-        puts "[ACMFacil::Auth] assert_valid exception: #{e.message}"
+        puts "[SignEng::Auth] assert_valid exception: #{e.message}"
         offline_grace_or_block("assert.exception", e.message)
       end
 
@@ -268,7 +245,7 @@ module ACMFacil
               return {
                 ok:    false,
                 code:  "license.plan_expired",
-                error: "Seu plano expirou. Renove em acmfacil.com.br/painel pra continuar."
+                error: "Seu plano expirou. Renove no painel do SignEng pra continuar."
               }
             end
           rescue
@@ -284,7 +261,7 @@ module ACMFacil
               return {
                 ok:    false,
                 code:  "license.trial_expired",
-                error: "Seu período de teste terminou. Assine um plano em acmfacil.com.br pra continuar."
+                error: "Seu período de teste terminou. Assine um plano do SignEng pra continuar."
               }
             end
           rescue
@@ -300,7 +277,7 @@ module ACMFacil
       def self.offline_grace_or_block(code, error)
         last_ok = Sketchup.read_default(DEFAULT_NS, "last_validated_at", "0").to_i
         if last_ok > 0 && (Time.now.to_i - last_ok) < GRACE_OFFLINE_SEC
-          puts "[ACMFacil::Auth] grace offline (último OK há #{((Time.now.to_i - last_ok)/3600.0).round(1)}h): #{code}"
+          puts "[SignEng::Auth] grace offline (último OK há #{((Time.now.to_i - last_ok)/3600.0).round(1)}h): #{code}"
           return { ok: true, code: "assert.grace_offline" }
         end
         msg = "Não foi possível confirmar sua licença. Conecte-se à internet."
@@ -349,7 +326,7 @@ module ACMFacil
       def self.persist_block_msg(msg)
         Sketchup.write_default(DEFAULT_NS, "auth_block_msg", msg.to_s) if msg
       rescue => e
-        puts "[ACMFacil::Auth] persist_block_msg erro: #{e.message}"
+        puts "[SignEng::Auth] persist_block_msg erro: #{e.message}"
       end
 
       def self.read_and_clear_block_msg
@@ -492,7 +469,7 @@ module ACMFacil
               }
             end
           rescue => e
-            puts "[ACMFacil::Auth] parse plan_ends_at erro: #{e.message}"
+            puts "[SignEng::Auth] parse plan_ends_at erro: #{e.message}"
           end
         end
 
@@ -519,7 +496,7 @@ module ACMFacil
             return {
               ok:    false,
               code:  "license.trial_expired",
-              error: "Seu período de teste terminou. Assine um plano em acmfacil.com.br pra continuar.",
+              error: "Seu período de teste terminou. Assine um plano do SignEng pra continuar.",
               license: {
                 plan: "expired", status: "expired", paid: false,
                 expires_at: trial_end, days_left: 0
@@ -583,7 +560,7 @@ module ACMFacil
           Sketchup.write_default(DEFAULT_NS, "cached_plan",          user[:plan].to_s)
           Sketchup.write_default(DEFAULT_NS, "cached_plan_ends_at",  user[:plan_ends_at].to_s)
           Sketchup.write_default(DEFAULT_NS, "cached_trial_ends_at", user[:trial_ends_at].to_s)
-          puts "[ACMFacil::Auth] machine OK (#{result['currentCount']}/#{result['maxMachines']})"
+          puts "[SignEng::Auth] machine OK (#{result['currentCount']}/#{result['maxMachines']})"
           return { ok: true, code: "machine.ok", machines: result["machines"] }
         end
 
@@ -606,32 +583,21 @@ module ACMFacil
         when "machine_limit"
           msg = "Limite de máquinas do seu plano atingido (#{result['maxMachines']}).\n\n" +
                 "Máquinas ativas:\n#{machine_lines}\n\n" +
-                "Pra usar este PC, acesse acmfacil.com.br/painel e desative uma das máquinas."
+                "Pra usar este PC, acesse o painel do SignEng e desative uma das máquinas."
           { ok: false, code: "license.machine_limit", error: msg, machines: machines, max_machines: result["maxMachines"] }
         when "plan_expired"
           { ok: false, code: "license.plan_expired",
-            error: "Seu plano expirou. Renove em acmfacil.com.br/painel pra continuar." }
+            error: "Seu plano expirou. Renove no painel do SignEng pra continuar." }
         when "machine_disabled"
           { ok: false, code: "license.machine_disabled",
-            error: "Este PC foi bloqueado pelo administrador. Entre em contato com o suporte em acmfacil.com.br." }
+            error: "Este PC foi bloqueado pelo administrador. Entre em contato com o suporte do SignEng." }
         else
           { ok: false, code: "machine.unknown",
             error: result["message"] || "Verificação de licença falhou." }
         end
       rescue => e
-        puts "[ACMFacil::Auth] check_machine_license exception: #{e.message}"
+        puts "[SignEng::Auth] check_machine_license exception: #{e.message}"
         offline_grace_or_block("machine.exception", e.message)
-      end
-
-      def self.build_master_fallback_user
-        {
-          local_id:  "admin-master",
-          email:     MASTER_EMAIL,
-          nome:      MASTER_NAME,
-          role:      "admin",
-          status:    "active",
-          modules:   all_modules
-        }
       end
 
       def self.build_master_license

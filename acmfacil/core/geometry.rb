@@ -4,7 +4,7 @@
 # Funções: box(), parse_json(), criar_mats()
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
 
     MM = 1.mm

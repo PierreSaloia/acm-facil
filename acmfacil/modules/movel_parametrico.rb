@@ -17,7 +17,7 @@
 # lugar (re-fatia o bloco original, que fica oculto no modelo).
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module MovelParametrico
 
@@ -45,7 +45,7 @@ module ACMFacil
           resizable:       true,
           style:           UI::HtmlDialog::STYLE_DIALOG
         )
-        @dialog.set_file(File.join(ACMFacil::UI_DIR, 'tools', 'movel_parametrico', 'index.html'))
+        @dialog.set_file(File.join(SignEng::UI_DIR, 'tools', 'movel_parametrico', 'index.html'))
         registrar_callbacks(@dialog)
         @dialog.set_on_closed { @dialog = nil }
         @dialog.show
@@ -54,10 +54,10 @@ module ACMFacil
       # ── Callbacks (padrão Bridge, diálogo próprio) ────────────────────────
       def self.registrar_callbacks(dlg)
         dlg.add_action_callback("movel_parametrico_ctx") do |_ctx, json|
-          data  = ACMFacil.parse_payload(json)
-          lang  = Sketchup.read_default(ACMFacil::DEFAULT_NS, "lang", "pt").to_s
+          data  = SignEng.parse_payload(json)
+          lang  = Sketchup.read_default(SignEng::DEFAULT_NS, "lang", "pt").to_s
           lang  = "pt" unless %w[pt es en].include?(lang)
-          theme = Sketchup.read_default(ACMFacil::DEFAULT_NS, "theme", "light").to_s
+          theme = Sketchup.read_default(SignEng::DEFAULT_NS, "theme", "light").to_s
           theme = "light" unless %w[light dark].include?(theme)
           cores_cat = {}
           ordem_cat = []
@@ -66,7 +66,7 @@ module ACMFacil
             ordem_cat << cat unless ordem_cat.include?(cat)
             (cores_cat[cat] ||= []) << { nome: nome, rgb: info[:rgb] }
           end
-          ACMFacil.resolver(dlg, data["id"], {
+          SignEng.resolver(dlg, data["id"], {
             ok: true, lang: lang, theme: theme, version: Core::VERSION,
             cores: cores_cat, ordem_cat: ordem_cat
           })
@@ -74,37 +74,37 @@ module ACMFacil
 
         # Carrega params de um móvel paramétrico selecionado (pra edição)
         dlg.add_action_callback("movel_parametrico_carregar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             sel = Sketchup.active_model.selection.to_a.find do |e|
               (e.is_a?(Sketchup::ComponentInstance) || e.is_a?(Sketchup::Group)) &&
                 e.get_attribute(DICT, 'params')
             end
             if sel.nil?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "mp.nada_selecionado" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "mp.nada_selecionado" })
             else
               params = JSON.parse(sel.get_attribute(DICT, 'params').to_s) rescue {}
-              ACMFacil.resolver(dlg, data["id"], { ok: true, entity_id: sel.entityID, params: params })
+              SignEng.resolver(dlg, data["id"], { ok: true, entity_id: sel.entityID, params: params })
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "mp.carregar_exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "mp.carregar_exception", error: e.message })
           end
         end
 
         dlg.add_action_callback("movel_parametrico_gerar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             v = Core::Auth.assert_valid!
             unless v[:ok]
-              ACMFacil.resolver(dlg, data["id"], v.merge(blocked: true))
+              SignEng.resolver(dlg, data["id"], v.merge(blocked: true))
               next
             end
             eid = data["entity_id"].to_i
             result = gerar(extrair(data["params"] || {}), eid > 0 ? eid : nil)
-            ACMFacil.resolver(dlg, data["id"], result)
+            SignEng.resolver(dlg, data["id"], result)
           rescue => e
             Sketchup.active_model.abort_operation rescue nil
-            ACMFacil.resolver(dlg, data["id"], {
+            SignEng.resolver(dlg, data["id"], {
               ok: false, code: "mp.gerar_exception",
               error: e.message, trace: e.backtrace.first(5)
             })

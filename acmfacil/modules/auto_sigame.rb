@@ -27,7 +27,7 @@
 # Corte & Encaixe/Logo 3D.
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
     module AutoSigame
 

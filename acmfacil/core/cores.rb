@@ -4,7 +4,7 @@
 # 54 cores ACM + 8 cores de junta
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
 
     # Cores VISUALMAXX — extraídas do arquivo "cores acm.skp"

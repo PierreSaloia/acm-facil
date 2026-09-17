@@ -11,7 +11,7 @@
 # A ferramenta tem diálogo próprio (compacto) — não passa pelo shell do plugin.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module Alinhar
 
@@ -50,7 +50,7 @@ module ACMFacil
           resizable:       true,
           style:           UI::HtmlDialog::STYLE_DIALOG
         )
-        @dialog.set_file(File.join(ACMFacil::UI_DIR, 'tools', 'alinhar', 'index.html'))
+        @dialog.set_file(File.join(SignEng::UI_DIR, 'tools', 'alinhar', 'index.html'))
         registrar_callbacks(@dialog)
         @dialog.set_on_closed do
           @dialog = nil
@@ -67,30 +67,30 @@ module ACMFacil
       # ── Callbacks do diálogo próprio (padrão Bridge) ──────────────────────
       def self.registrar_callbacks(dlg)
         dlg.add_action_callback("alinhar_ctx") do |_ctx, json|
-          data  = ACMFacil.parse_payload(json)
-          lang  = Sketchup.read_default(ACMFacil::DEFAULT_NS, "lang", "pt").to_s
+          data  = SignEng.parse_payload(json)
+          lang  = Sketchup.read_default(SignEng::DEFAULT_NS, "lang", "pt").to_s
           lang  = "pt" unless %w[pt es en].include?(lang)
-          theme = Sketchup.read_default(ACMFacil::DEFAULT_NS, "theme", "light").to_s
+          theme = Sketchup.read_default(SignEng::DEFAULT_NS, "theme", "light").to_s
           theme = "light" unless %w[light dark].include?(theme)
-          ACMFacil.resolver(dlg, data["id"], { ok: true, lang: lang, theme: theme, version: Core::VERSION })
+          SignEng.resolver(dlg, data["id"], { ok: true, lang: lang, theme: theme, version: Core::VERSION })
         end
 
         dlg.add_action_callback("alinhar_aplicar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             result = aplicar(data["align"].to_s, data["face"].to_s)
-            ACMFacil.resolver(dlg, data["id"], result)
+            SignEng.resolver(dlg, data["id"], result)
           rescue => e
             Sketchup.active_model.abort_operation rescue nil
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "alinhar.exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "alinhar.exception", error: e.message })
           end
         end
 
         dlg.add_action_callback("alinhar_reiniciar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           reset_picks
           ativar_ferramenta
-          ACMFacil.resolver(dlg, data["id"], { ok: true })
+          SignEng.resolver(dlg, data["id"], { ok: true })
         end
       end
 

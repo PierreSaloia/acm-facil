@@ -12,7 +12,7 @@
 # PRÉ-LANÇAMENTO: sem card no dashboard e sem entrada no site/admin.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module GeoArt
 
@@ -41,7 +41,7 @@ module ACMFacil
           resizable:       true,
           style:           UI::HtmlDialog::STYLE_DIALOG
         )
-        @dialog.set_file(File.join(ACMFacil::UI_DIR, 'tools', 'desenho_geometrico', 'index.html'))
+        @dialog.set_file(File.join(SignEng::UI_DIR, 'tools', 'desenho_geometrico', 'index.html'))
         registrar_callbacks(@dialog)
         @dialog.set_on_closed { @dialog = nil }
         @dialog.show
@@ -49,30 +49,30 @@ module ACMFacil
 
       def self.registrar_callbacks(dlg)
         dlg.add_action_callback("geoart_ctx") do |_ctx, json|
-          data  = ACMFacil.parse_payload(json)
-          lang  = Sketchup.read_default(ACMFacil::DEFAULT_NS, "lang", "pt").to_s
+          data  = SignEng.parse_payload(json)
+          lang  = Sketchup.read_default(SignEng::DEFAULT_NS, "lang", "pt").to_s
           lang  = "pt" unless %w[pt es en].include?(lang)
-          ACMFacil.resolver(dlg, data["id"], { ok: true, lang: lang, version: Core::VERSION })
+          SignEng.resolver(dlg, data["id"], { ok: true, lang: lang, version: Core::VERSION })
         end
 
         # Carrega a FOTO (JPG/PNG) → guarda base64 + devolve data-url pro preview
         dlg.add_action_callback("geoart_carregar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             path = UI.openpanel("Selecione a foto (JPG/PNG)", "", "Imagens|*.jpg;*.jpeg;*.png||")
             if path.nil?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.cancelled" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.cancelled" })
               next
             end
             ext = File.extname(path).downcase.delete('.')
             ext = 'jpeg' if ext == 'jpg'
             unless %w[jpeg png].include?(ext)
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.invalid_ext" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.invalid_ext" })
               next
             end
             bytes = File.binread(path)
             if bytes.bytesize > 12 * 1024 * 1024
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.too_big" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.too_big" })
               next
             end
             require 'base64'
@@ -80,21 +80,21 @@ module ACMFacil
             @img_fmt = ext
             @result  = nil
             @mesh3d  = nil
-            ACMFacil.resolver(dlg, data["id"], {
+            SignEng.resolver(dlg, data["id"], {
               ok: true, filename: File.basename(path),
               data_url: "data:image/#{ext};base64,#{@img_b64}"
             })
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
           end
         end
 
         # Processa no SERVIDOR (Delaunay + cores) → devolve triângulos pro preview
         dlg.add_action_callback("geoart_processar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             unless @img_b64
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.no_image" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.no_image" })
               next
             end
             r = solicitar_geoart_servidor({
@@ -104,30 +104,30 @@ module ACMFacil
               "tol"           => (data["tol"] || 40).to_i
             })
             unless r[:ok]
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.server", error: r[:error] })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.server", error: r[:error] })
               next
             end
             @result = r[:result]
-            ACMFacil.resolver(dlg, data["id"], {
+            SignEng.resolver(dlg, data["id"], {
               ok: true, w: @result["w"], h: @result["h"],
               n: (@result["tris"] || []).length, tris: @result["tris"]
             })
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
           end
         end
 
         # Gera o MOSAICO 3D: cada triângulo = peça de ACM extrudada na cor média
         dlg.add_action_callback("geoart_gerar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             v = Core::Auth.assert_valid!
             unless v[:ok]
-              ACMFacil.resolver(dlg, data["id"], v.merge(blocked: true))
+              SignEng.resolver(dlg, data["id"], v.merge(blocked: true))
               next
             end
             unless @result && @result["tris"] && !@result["tris"].empty?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.no_result" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.no_result" })
               next
             end
             n = gerar_mosaico(
@@ -135,19 +135,19 @@ module ACMFacil
               (data["esp_mm"]   || 3).to_f,
               (data["folga_mm"] || 2).to_f
             )
-            ACMFacil.resolver(dlg, data["id"], { ok: true, n: n })
+            SignEng.resolver(dlg, data["id"], { ok: true, n: n })
           rescue => e
             Sketchup.active_model.abort_operation rescue nil
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
           end
         end
 
         # 3D COM IA: foto → Hunyuan3D-2 (via servidor) → malha low-poly decimada
         dlg.add_action_callback("geoart_3d_processar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             unless @img_b64
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.no_image" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.no_image" })
               next
             end
             r = solicitar_geoart3d_servidor({
@@ -156,37 +156,37 @@ module ACMFacil
               "faces"   => (data["faces"] || 500).to_i
             })
             unless r[:ok]
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.server", error: r[:error] })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.server", error: r[:error] })
               next
             end
             @mesh3d = r[:result]
-            ACMFacil.resolver(dlg, data["id"], {
+            SignEng.resolver(dlg, data["id"], {
               ok: true, nv: @mesh3d["nv"], nf: @mesh3d["nf"],
               verts: @mesh3d["verts"], faces: @mesh3d["faces"]
             })
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
           end
         end
 
         # Gera o SÓLIDO 3D no SketchUp a partir da malha decimada
         dlg.add_action_callback("geoart_3d_gerar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             v = Core::Auth.assert_valid!
             unless v[:ok]
-              ACMFacil.resolver(dlg, data["id"], v.merge(blocked: true))
+              SignEng.resolver(dlg, data["id"], v.merge(blocked: true))
               next
             end
             unless @mesh3d && @mesh3d["faces"] && !@mesh3d["faces"].empty?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.no_result3d" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.no_result3d" })
               next
             end
             n = gerar_solido3d((data["larg_mm"] || 600).to_f)
-            ACMFacil.resolver(dlg, data["id"], { ok: true, n: n })
+            SignEng.resolver(dlg, data["id"], { ok: true, n: n })
           rescue => e
             Sketchup.active_model.abort_operation rescue nil
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "geoart.exception", error: e.message })
           end
         end
       end

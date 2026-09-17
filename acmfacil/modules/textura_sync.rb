@@ -19,7 +19,7 @@
 #      mundiais (garantia de sincronia entre todas as faces)
 # ============================================================================
 
-module ACMFacil
+module SignEng
   module Generator
     module TexturaSync
 

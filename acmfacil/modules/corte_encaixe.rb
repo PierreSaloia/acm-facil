@@ -11,7 +11,7 @@
 # Toda a geometria dos dentes/kerf/dogbone é calculada no panel.js.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module CorteEncaixe
 

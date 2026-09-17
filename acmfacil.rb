@@ -8,15 +8,15 @@ require 'extensions.rb'
 # Registra a extensão e carrega o main.rb sob demanda.
 # ═════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   unless file_loaded?(__FILE__)
     ext = SketchupExtension.new(
       "SignEng",
       File.join(File.dirname(__FILE__), "acmfacil", "main")
     )
     ext.version     = "1.9.32"
-    ext.creator     = "Marcelo Para Oficial"
-    ext.copyright   = "© 2026 Marcelo Para Oficial"
+    ext.creator     = "SignEng"
+    ext.copyright   = "© 2026 SignEng"
     ext.description = "Plugin para geração paramétrica de fachadas em ACM. " \
                       "Suporta múltiplos módulos geradores (marquise, colunas, " \
                       "auto-ACM, corte CNC e mais) com design moderno e fluxo " \

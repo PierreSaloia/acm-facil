@@ -16,7 +16,7 @@
 # selecionado → Regenerar no lugar. Cada peça etiquetada (LT3D - ...).
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module Letra3d
 
@@ -60,7 +60,7 @@ module ACMFacil
           resizable:       true,
           style:           UI::HtmlDialog::STYLE_DIALOG
         )
-        @dialog.set_file(File.join(ACMFacil::UI_DIR, 'tools', 'letra3d', 'index.html'))
+        @dialog.set_file(File.join(SignEng::UI_DIR, 'tools', 'letra3d', 'index.html'))
         registrar_callbacks(@dialog)
         @dialog.set_on_closed { @dialog = nil }
         @dialog.show
@@ -68,10 +68,10 @@ module ACMFacil
 
       def self.registrar_callbacks(dlg)
         dlg.add_action_callback("letra3d_ctx") do |_ctx, json|
-          data  = ACMFacil.parse_payload(json)
-          lang  = Sketchup.read_default(ACMFacil::DEFAULT_NS, "lang", "pt").to_s
+          data  = SignEng.parse_payload(json)
+          lang  = Sketchup.read_default(SignEng::DEFAULT_NS, "lang", "pt").to_s
           lang  = "pt" unless %w[pt es en].include?(lang)
-          theme = Sketchup.read_default(ACMFacil::DEFAULT_NS, "theme", "light").to_s
+          theme = Sketchup.read_default(SignEng::DEFAULT_NS, "theme", "light").to_s
           theme = "light" unless %w[light dark].include?(theme)
           cores_cat = {}
           ordem_cat = []
@@ -80,7 +80,7 @@ module ACMFacil
             ordem_cat << cat unless ordem_cat.include?(cat)
             (cores_cat[cat] ||= []) << { nome: nome, rgb: info[:rgb] }
           end
-          ACMFacil.resolver(dlg, data["id"], {
+          SignEng.resolver(dlg, data["id"], {
             ok: true, lang: lang, theme: theme, version: Core::VERSION,
             cores: cores_cat, ordem_cat: ordem_cat
           })
@@ -88,66 +88,66 @@ module ACMFacil
 
         # Importa o SVG (reusa o file dialog + parser do Logo 3D)
         dlg.add_action_callback("letra3d_importar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             r = Generator::Logo3D.carregar_arquivo_data
             if r[:ok] && r[:is_dxf]
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "letra3d.somente_svg" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "letra3d.somente_svg" })
             elsif r[:ok]
               @svg_path = r[:path]
-              ACMFacil.resolver(dlg, data["id"], {
+              SignEng.resolver(dlg, data["id"], {
                 ok: true, filename: r[:filename], n_paths: r[:n_paths],
                 dims_mm: r[:dims_mm], paths_2d: r[:paths_2d]
               })
             else
-              ACMFacil.resolver(dlg, data["id"], r)
+              SignEng.resolver(dlg, data["id"], r)
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "letra3d.importar_error", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "letra3d.importar_error", error: e.message })
           end
         end
 
         # Carrega params de uma Letra 3D selecionada (pra edição)
         dlg.add_action_callback("letra3d_carregar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             sel = Sketchup.active_model.selection.to_a.find do |e|
               (e.is_a?(Sketchup::ComponentInstance) || e.is_a?(Sketchup::Group)) &&
                 e.get_attribute(DICT, 'params')
             end
             if sel.nil?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "letra3d.nada_selecionado" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "letra3d.nada_selecionado" })
             else
               params = JSON.parse(sel.get_attribute(DICT, 'params').to_s) rescue {}
               svg = sel.get_attribute(DICT, 'svg_path').to_s
               @svg_path = svg if !svg.empty? && File.exist?(svg)
               svg_ok = (@svg_path && File.exist?(@svg_path)) ? true : false
               paths = svg_ok ? (Generator::Logo3D.parse_svg(@svg_path) rescue nil) : nil
-              ACMFacil.resolver(dlg, data["id"], {
+              SignEng.resolver(dlg, data["id"], {
                 ok: true, entity_id: sel.entityID, params: params,
                 filename: (@svg_path ? File.basename(@svg_path) : nil),
                 svg_ok: svg_ok, paths_2d: paths
               })
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "letra3d.carregar_exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "letra3d.carregar_exception", error: e.message })
           end
         end
 
         dlg.add_action_callback("letra3d_gerar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             v = Core::Auth.assert_valid!
             unless v[:ok]
-              ACMFacil.resolver(dlg, data["id"], v.merge(blocked: true))
+              SignEng.resolver(dlg, data["id"], v.merge(blocked: true))
               next
             end
             eid = data["entity_id"].to_i
             result = gerar(extrair(data["params"] || {}), eid > 0 ? eid : nil)
-            ACMFacil.resolver(dlg, data["id"], result)
+            SignEng.resolver(dlg, data["id"], result)
           rescue => e
             Sketchup.active_model.abort_operation rescue nil
-            ACMFacil.resolver(dlg, data["id"], {
+            SignEng.resolver(dlg, data["id"], {
               ok: false, code: "letra3d.gerar_exception",
               error: e.message, trace: e.backtrace.first(5)
             })

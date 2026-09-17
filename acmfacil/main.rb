@@ -9,7 +9,7 @@ require 'fileutils'
 # Inicializa o diálogo HTML, registra callbacks, cria menu e toolbar.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   PLUGIN_DIR = File.dirname(__FILE__)
   UI_DIR     = File.join(PLUGIN_DIR, 'ui')
   ICONS_DIR  = File.join(PLUGIN_DIR, 'resources', 'toolbar_icons')
@@ -57,7 +57,7 @@ module ACMFacil
 
     @dialog = UI::HtmlDialog.new(
       dialog_title:    "SignEng v#{Core::VERSION}",
-      preferences_key: "com.acmfacil.plugin",
+      preferences_key: "com.signeng.plugin",
       width:           1100,
       height:          720,
       min_width:       900,
@@ -1597,11 +1597,11 @@ module ACMFacil
   # ─────────────────────────────────────────────────────────────────────────
   unless file_loaded?(__FILE__)
     menu = UI.menu("Plugins")
-    menu.add_item("SignEng") { ACMFacil.abrir }
-    menu.add_item("SignEng — Reload (DEV)") { ACMFacil.reload_dev }
+    menu.add_item("SignEng") { SignEng.abrir }
+    menu.add_item("SignEng — Reload (DEV)") { SignEng.reload_dev }
 
     toolbar = UI::Toolbar.new("SignEng")
-    cmd = UI::Command.new("SignEng") { ACMFacil.abrir }
+    cmd = UI::Command.new("SignEng") { SignEng.abrir }
     cmd.tooltip         = "SignEng — Gerador de Fachadas ACM"
     cmd.status_bar_text = "Abre o plugin SignEng"
     cmd.small_icon      = File.join(ICONS_DIR, 'icon_24.svg')
@@ -1619,7 +1619,7 @@ module ACMFacil
       ['corte_encaixe',  'Corte & Encaixe', 'Encaixes dente-a-dente e nesting com export SVG/DXF']
     ]
     modulos_toolbar.each do |mid, nome, desc|
-      c = UI::Command.new("SignEng — #{nome}") { ACMFacil.abrir_modulo(mid) }
+      c = UI::Command.new("SignEng — #{nome}") { SignEng.abrir_modulo(mid) }
       c.tooltip         = "#{nome} — #{desc}"
       c.status_bar_text = desc
       c.small_icon      = File.join(ICONS_DIR, "#{mid}_24.svg")
@@ -1627,14 +1627,14 @@ module ACMFacil
       toolbar.add_item(c)
     end
 
-    cmd_alinhar = UI::Command.new("SignEng — Alinhar") { ACMFacil::Generator::Alinhar.ativar }
+    cmd_alinhar = UI::Command.new("SignEng — Alinhar") { SignEng::Generator::Alinhar.ativar }
     cmd_alinhar.tooltip         = "Alinhar — objeto 2 alinha ao objeto 1 (fixo)"
     cmd_alinhar.status_bar_text = "Alinha um grupo/componente a outro por borda, centro e faceamento"
     cmd_alinhar.small_icon      = File.join(ICONS_DIR, 'alinhar_24.svg')
     cmd_alinhar.large_icon      = File.join(ICONS_DIR, 'alinhar_32.svg')
     toolbar.add_item(cmd_alinhar)
 
-    cmd_luminoso = UI::Command.new("SignEng — Luminoso") { ACMFacil::Generator::Luminoso.ativar }
+    cmd_luminoso = UI::Command.new("SignEng — Luminoso") { SignEng::Generator::Luminoso.ativar }
     cmd_luminoso.tooltip         = "Luminoso — gera luminoso em ACM (redondo/quadrado/retangular)"
     cmd_luminoso.status_bar_text = "Gera luminoso paramétrico em ACM como componente editável"
     cmd_luminoso.small_icon      = File.join(ICONS_DIR, 'luminoso_24.svg')
@@ -1644,7 +1644,7 @@ module ACMFacil
     # LETRA 3D — módulo PAUSADO (2026-07-12, pedido do Marcelo): botão oculto
     # da toolbar até retomarmos. Pra reativar, descomentar o bloco abaixo.
     # Estado da depuração: docs/SESSION_LOG.md (v1.8.78→v1.8.80).
-    # cmd_letra3d = UI::Command.new("SignEng — Letra 3D") { ACMFacil::Generator::Letra3d.ativar }
+    # cmd_letra3d = UI::Command.new("SignEng — Letra 3D") { SignEng::Generator::Letra3d.ativar }
     # cmd_letra3d.tooltip         = "Letra 3D — letras caixa pra impressão 3D a partir de SVG"
     # cmd_letra3d.status_bar_text = "Gera letras caixa pra impressão 3D (casca, suporte, fundo e acrílico)"
     # cmd_letra3d.small_icon      = File.join(ICONS_DIR, 'letra3d_24.svg')
@@ -1654,14 +1654,14 @@ module ACMFacil
     # DESENHO GEOMÉTRICO — Fase 1, OCULTO na release pública (2026-07-24,
     # pedido do Marcelo): sai da toolbar até o lançamento oficial.
     # Pra reativar (teste interno), descomentar o bloco abaixo.
-    # cmd_geoart = UI::Command.new("SignEng — Desenho Geométrico") { ACMFacil::Generator::GeoArt.ativar }
+    # cmd_geoart = UI::Command.new("SignEng — Desenho Geométrico") { SignEng::Generator::GeoArt.ativar }
     # cmd_geoart.tooltip         = "Desenho Geométrico — foto vira mosaico low-poly em ACM"
     # cmd_geoart.status_bar_text = "Transforma uma foto em quadro geométrico (mosaico de triângulos em ACM)"
     # cmd_geoart.small_icon      = File.join(ICONS_DIR, 'desenho_geometrico_24.svg')
     # cmd_geoart.large_icon      = File.join(ICONS_DIR, 'desenho_geometrico_32.svg')
     # toolbar.add_item(cmd_geoart)
 
-    cmd_movelparam = UI::Command.new("SignEng — Móvel Paramétrico") { ACMFacil::Generator::MovelParametrico.ativar }
+    cmd_movelparam = UI::Command.new("SignEng — Móvel Paramétrico") { SignEng::Generator::MovelParametrico.ativar }
     cmd_movelparam.tooltip         = "Móvel Paramétrico — fatia um sólido em chapas paralelas com fixação"
     cmd_movelparam.status_bar_text = "Gera móvel/painel paramétrico fatiado a partir de um sólido selecionado"
     cmd_movelparam.small_icon      = File.join(ICONS_DIR, 'movel_parametrico_24.svg')

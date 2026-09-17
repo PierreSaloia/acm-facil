@@ -16,7 +16,7 @@
 # com a base no z=0.
 # ═══════════════════════════════════════════════════════════════════════════
 
-module ACMFacil
+module SignEng
   module Generator
     module Luminoso
 
@@ -46,7 +46,7 @@ module ACMFacil
           resizable:       true,
           style:           UI::HtmlDialog::STYLE_DIALOG
         )
-        @dialog.set_file(File.join(ACMFacil::UI_DIR, 'tools', 'luminoso', 'index.html'))
+        @dialog.set_file(File.join(SignEng::UI_DIR, 'tools', 'luminoso', 'index.html'))
         registrar_callbacks(@dialog)
         @dialog.set_on_closed { @dialog = nil }
         @dialog.show
@@ -55,10 +55,10 @@ module ACMFacil
       # ── Callbacks (padrão Bridge, diálogo próprio) ────────────────────────
       def self.registrar_callbacks(dlg)
         dlg.add_action_callback("luminoso_ctx") do |_ctx, json|
-          data  = ACMFacil.parse_payload(json)
-          lang  = Sketchup.read_default(ACMFacil::DEFAULT_NS, "lang", "pt").to_s
+          data  = SignEng.parse_payload(json)
+          lang  = Sketchup.read_default(SignEng::DEFAULT_NS, "lang", "pt").to_s
           lang  = "pt" unless %w[pt es en].include?(lang)
-          theme = Sketchup.read_default(ACMFacil::DEFAULT_NS, "theme", "light").to_s
+          theme = Sketchup.read_default(SignEng::DEFAULT_NS, "theme", "light").to_s
           theme = "light" unless %w[light dark].include?(theme)
 
           cores_cat = {}
@@ -70,7 +70,7 @@ module ACMFacil
             cores_cat[cat] << { nome: nome, rgb: info[:rgb] }
           end
 
-          ACMFacil.resolver(dlg, data["id"], {
+          SignEng.resolver(dlg, data["id"], {
             ok: true, lang: lang, theme: theme, version: Core::VERSION,
             cores: cores_cat, ordem_cat: ordem_cat
           })
@@ -78,47 +78,47 @@ module ACMFacil
 
         # Carrega params de um luminoso selecionado (pra edição)
         dlg.add_action_callback("luminoso_carregar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             sel = Sketchup.active_model.selection.to_a.find do |e|
               (e.is_a?(Sketchup::ComponentInstance) || e.is_a?(Sketchup::Group)) &&
                 e.get_attribute(DICT, 'params')
             end
             if sel.nil?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "luminoso.nada_selecionado" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "luminoso.nada_selecionado" })
             else
               params = JSON.parse(sel.get_attribute(DICT, 'params').to_s) rescue {}
-              ACMFacil.resolver(dlg, data["id"], { ok: true, entity_id: sel.entityID, params: params })
+              SignEng.resolver(dlg, data["id"], { ok: true, entity_id: sel.entityID, params: params })
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "luminoso.carregar_exception", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "luminoso.carregar_exception", error: e.message })
           end
         end
 
         # Cadastro da empresa (logo, razão social...) pro plano de corte —
         # mesmo arquivo do shell principal (empresa.json)
         dlg.add_action_callback("luminoso_empresa") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
-            path = ACMFacil.empresa_file_path
+            path = SignEng.empresa_file_path
             empresa = File.exist?(path) ? JSON.parse(File.read(path, mode: 'rb:UTF-8')) : {}
-            ACMFacil.resolver(dlg, data["id"], { ok: true, empresa: empresa })
+            SignEng.resolver(dlg, data["id"], { ok: true, empresa: empresa })
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: true, empresa: {} })
+            SignEng.resolver(dlg, data["id"], { ok: true, empresa: {} })
           end
         end
 
         # Salva o Plano de Corte (HTML pronto pra imprimir em PDF) e abre
         # no navegador — mesmo padrão do autoacm_salvar_plano
         dlg.add_action_callback("luminoso_salvar_plano") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             name = data["name"].to_s.gsub(/[^a-zA-Z0-9_\-]/, '_')
             name = "Plano_Luminoso" if name.empty?
             content = Base64.decode64(data["content"].to_s)
             path = UI.savepanel("Salvar Plano de Corte", Dir.home, "#{name}.html")
             if path.nil?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "user_cancelled" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "user_cancelled" })
             else
               path += ".html" unless path.downcase.end_with?(".html", ".htm")
               File.open(path, 'wb') { |f| f.write(content) }
@@ -128,33 +128,33 @@ module ACMFacil
               rescue => open_err
                 puts "[Luminoso] Aviso: nao foi possivel abrir o plano: #{open_err.message}"
               end
-              ACMFacil.resolver(dlg, data["id"], { ok: true, path: File.basename(path) })
+              SignEng.resolver(dlg, data["id"], { ok: true, path: File.basename(path) })
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "luminoso.plano_error", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "luminoso.plano_error", error: e.message })
           end
         end
 
         # Vistas do luminoso gerado (frente/fundo/lateral/topo/iso) em PNG
         # base64 pro plano de corte
         dlg.add_action_callback("luminoso_snapshots") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             eid = data["entity_id"].to_i
             ent = Sketchup.active_model.find_entity_by_id(eid) rescue nil
             if ent && ent.valid?
-              ACMFacil.resolver(dlg, data["id"], snapshots(ent))
+              SignEng.resolver(dlg, data["id"], snapshots(ent))
             else
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "luminoso.sem_entidade" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "luminoso.sem_entidade" })
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "luminoso.snap_error", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "luminoso.snap_error", error: e.message })
           end
         end
 
         # Salva arquivo de corte (SVG ou DXF, gerado no JS, base64) via savepanel
         dlg.add_action_callback("luminoso_salvar_svg") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             name = data["name"].to_s.gsub(/[^a-zA-Z0-9_\-]/, '_')
             name = "luminoso_corte" if name.empty?
@@ -163,33 +163,33 @@ module ACMFacil
             content = Base64.decode64(data["content"].to_s)
             path = UI.savepanel("Salvar Arquivo de Corte", Dir.home, "#{name}.#{ext}")
             if path.nil?
-              ACMFacil.resolver(dlg, data["id"], { ok: false, code: "user_cancelled" })
+              SignEng.resolver(dlg, data["id"], { ok: false, code: "user_cancelled" })
             else
               path += ".#{ext}" unless path.downcase.end_with?(".#{ext}")
               File.open(path, 'wb') { |f| f.write(content) }
               puts "[Luminoso] Corte salvo: #{path} (#{content.bytesize} bytes)"
-              ACMFacil.resolver(dlg, data["id"], { ok: true, path: File.basename(path) })
+              SignEng.resolver(dlg, data["id"], { ok: true, path: File.basename(path) })
             end
           rescue => e
-            ACMFacil.resolver(dlg, data["id"], { ok: false, code: "luminoso.svg_error", error: e.message })
+            SignEng.resolver(dlg, data["id"], { ok: false, code: "luminoso.svg_error", error: e.message })
           end
         end
 
         dlg.add_action_callback("luminoso_gerar") do |_ctx, json|
-          data = ACMFacil.parse_payload(json)
+          data = SignEng.parse_payload(json)
           begin
             v = Core::Auth.assert_valid!
             unless v[:ok]
-              ACMFacil.resolver(dlg, data["id"], v.merge(blocked: true))
+              SignEng.resolver(dlg, data["id"], v.merge(blocked: true))
               next
             end
             params = data["params"] || {}
             eid    = data["entity_id"].to_i
             result = gerar(extrair(params), eid > 0 ? eid : nil)
-            ACMFacil.resolver(dlg, data["id"], result)
+            SignEng.resolver(dlg, data["id"], result)
           rescue => e
             Sketchup.active_model.abort_operation rescue nil
-            ACMFacil.resolver(dlg, data["id"], {
+            SignEng.resolver(dlg, data["id"], {
               ok: false, code: "luminoso.gerar_exception",
               error: e.message, trace: e.backtrace.first(5)
             })
