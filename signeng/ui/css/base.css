@@ -1,0 +1,128 @@
+/* ══════════════════════════════════════════════════════════════════════════
+   SignEng — Base styles (reset + globais)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* diálogo não rola — cada view rola internamente */
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: var(--fw-regular);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  line-height: var(--leading-normal);
+}
+
+/* ── Reset de elementos comuns ─────────────────────────────── */
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+  outline: none;
+  background: none;
+}
+button { cursor: pointer; }
+
+/* Garante que [hidden] sempre esconde, mesmo em elementos com display customizado */
+[hidden] { display: none !important; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease);
+}
+
+img, svg {
+  display: block;
+  max-width: 100%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+p { line-height: var(--leading-normal); }
+
+ul, ol { list-style: none; }
+
+/* ── Seleção de texto ─────────────────────────────────────── */
+::selection {
+  background: var(--neutral-900);
+  color: var(--neutral-0);
+}
+
+/* ── Scrollbar custom (webkit) ────────────────────────────── */
+::-webkit-scrollbar            { width: 10px; height: 10px; }
+::-webkit-scrollbar-track      { background: var(--bg-subtle); }
+::-webkit-scrollbar-thumb      { background: var(--neutral-300); border-radius: var(--radius-full); border: 2px solid var(--bg-subtle); }
+::-webkit-scrollbar-thumb:hover{ background: var(--neutral-400); }
+
+/* ── App shell ─────────────────────────────────────────────── */
+.app {
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app__views {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  /* ★ A view é a ÚNICA que scrolla. Os filhos (.module-body etc) NÃO
+     devem ter overflow: auto — senão dá dupla barra ou conteúdo cortado
+     (flexbox min-height bug no Chromium antigo do SketchUp). */
+  overflow: auto;
+  animation: fadeIn var(--duration) var(--ease-out);
+}
+
+.view[hidden] { display: none !important; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Transição de cor suave pra TUDO que muda tema (dark mode preparado) */
+html, body, .app,
+.view, .topbar, .module-body, .module-header,
+.card, .btn, .field__input, .aa__section,
+.lang-bar, .lang-switch, .scale-switch, .lang-switch__btn, .scale-switch__btn {
+  transition: background-color var(--duration) var(--ease),
+              border-color var(--duration) var(--ease),
+              color var(--duration) var(--ease);
+}
+
+/* ── Utilitários mínimos ─────────────────────────────────── */
+.icon      { width: 16px; height: 16px; flex-shrink: 0; }
+.icon-sm   { width: 14px; height: 14px; flex-shrink: 0; }
+.icon-lg   { width: 20px; height: 20px; flex-shrink: 0; }
+.icon-xl   { width: 24px; height: 24px; flex-shrink: 0; }
+
+.u-hidden  { display: none !important; }
+.u-visible { display: block !important; }

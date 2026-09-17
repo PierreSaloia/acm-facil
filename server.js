@@ -1,3 +1,13 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// SignEng — servidor de PREVIEW da UI (mock)
+// ═══════════════════════════════════════════════════════════════════════════
+// Serve a mesma UI (signeng/ui) fora do SketchUp, num navegador comum, pra
+// visualizar layout/telas sem precisar abrir o plugin real. Todas as ações
+// abaixo respondem com dados fake (ok:true) — NENHUMA geração 3D, login,
+// licenciamento ou cálculo real acontece aqui. O produto de verdade continua
+// sendo o plugin Ruby (signeng.rb + signeng/), carregado dentro do SketchUp.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -46,8 +56,8 @@ app.post('/api/ui_pending_module', (req, res) => {
 app.post('/api/ui_load_module', async (req, res) => {
   try {
     const { name } = req.body;
-    const modDir = path.join(__dirname, 'acmfacil', 'ui', 'modules', name);
-    
+    const modDir = path.join(__dirname, 'signeng', 'ui', 'modules', name);
+
     let html = '';
     let css = '';
     let js = '';
@@ -73,7 +83,7 @@ app.post('/api/empresa_save', async (req, res) => {
 });
 
 app.post('/api/auth_login', (req, res) => {
-  res.json({ 
+  res.json({
     ok: true,
     user: {
       local_id: 'mock-user',
@@ -108,10 +118,10 @@ app.post('/api/:action', async (req, res) => {
 
 
 // ─────────── STATIC FILES ───────────
-app.use(express.static(path.join(__dirname, 'acmfacil', 'ui')));
+app.use(express.static(path.join(__dirname, 'signeng', 'ui')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'acmfacil', 'ui', 'index.html'));
+  res.sendFile(path.join(__dirname, 'signeng', 'ui', 'index.html'));
 });
 
 const PORT = 3000;

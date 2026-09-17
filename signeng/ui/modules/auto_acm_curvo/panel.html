@@ -1,0 +1,561 @@
+<!-- ══════════════════════════════════════════════════════════════════════
+     AUTO-ACM CURVO — painel do módulo (v2: facetas dinâmicas + paridade auto_acm)
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<div class="aac">
+
+  <!-- ═════════ HEADER / HERO ═════════ -->
+  <section class="aac__hero">
+    <div class="aac__hero-text">
+      <div class="section-header__label-row">
+        <span class="section-header__label">MODO REVERSO · CURVO</span>
+        <div class="section-header__divider"></div>
+      </div>
+      <h2 class="aac__hero-title">Auto-ACM Curvo</h2>
+      <p class="aac__hero-subtitle">
+        Para colunas e elementos com faces trapezoidais (afunilados ou em
+        curvatura facetada). Detecta dinamicamente o número de facetas frontais
+        e traseiras, gera estrutura completa: montantes, anéis, travessas,
+        emendas, juntas e fita.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═════════ ETAPAS ═════════ -->
+  <section class="aac__steps">
+    <div class="aac__step">
+      <div class="aac__step-num">1</div>
+      <div class="aac__step-content">
+        <h3 class="aac__step-title">Modele a forma</h3>
+        <p class="aac__step-desc">Crie um sólido com topo + base + 2 laterais retas + N facetas frontais (e opcional traseiras).</p>
+      </div>
+    </div>
+    <div class="aac__step">
+      <div class="aac__step-num">2</div>
+      <div class="aac__step-content">
+        <h3 class="aac__step-title">Capture as faces</h3>
+        <p class="aac__step-desc">Selecione o(s) grupo(s) e clique em Capturar. As faces serão pintadas conforme o papel detectado.</p>
+      </div>
+    </div>
+    <div class="aac__step">
+      <div class="aac__step-num">3</div>
+      <div class="aac__step-content">
+        <h3 class="aac__step-title">Configure e gere</h3>
+        <p class="aac__step-desc">Escolha cor ACM, chapa, perfis, juntas e clique em Gerar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ CAPTURA ═════════ -->
+  <section class="aac__capture">
+    <button class="btn btn--primary btn--lg btn--block aac__capture-btn" id="aac_btn_capturar" onclick="AutoAcmCurvo.capturarFaces()">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21l4-12 7-4 7 4-4 12z"/>
+        <line x1="7" y1="9" x2="17" y2="9"/>
+        <line x1="14" y1="5" x2="11" y2="21"/>
+      </svg>
+      <span>Capturar faces dos grupos selecionados</span>
+    </button>
+    <div class="aac__capture-hint">
+      <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+      <span>Para multi-módulo, segure Ctrl ao selecionar (somente o último vira ativo nas configs).</span>
+    </div>
+  </section>
+
+  <!-- ═════════ TABS DE MÓDULOS ═════════ -->
+  <section class="aac__tabs" id="aac_tabs_wrap" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">MÓDULOS CAPTURADOS</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__tabs-row" id="aac_tabs"></div>
+  </section>
+
+  <!-- ═════════ FACES DETECTADAS (paleta de captura) ═════════ -->
+  <section class="aac__section" id="aac_faces_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">FACES CAPTURADAS</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <p class="aac__section-hint">Cada cor identifica um papel da face (mesmo padrão do Auto-ACM normal). Facetas do mesmo papel recebem a mesma cor.</p>
+    <div class="aac__faces-list" id="aac_faces_list"></div>
+  </section>
+
+  <!-- ═════════ FACES HABILITADAS (revestir / não revestir) ═════════ -->
+  <section class="aac__section" id="aac_enab_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">FACES A REVESTIR</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <p class="aac__section-hint">Marque as faces que receberão o ACM. Faces desmarcadas serão removidas do sólido.</p>
+    <div class="aac__face-checks">
+      <label class="aac__face-check">
+        <input type="checkbox" id="aac_enab_frontal" checked>
+        <span class="aac__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1"/></svg></span>
+        <span class="aac__face-check-label">Frontal <small id="aac_n_front" class="aac__face-count"></small></span>
+      </label>
+      <label class="aac__face-check">
+        <input type="checkbox" id="aac_enab_traseira" checked>
+        <span class="aac__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="14" rx="1" stroke-dasharray="2 2"/></svg></span>
+        <span class="aac__face-check-label">Traseira <small id="aac_n_tras" class="aac__face-count"></small></span>
+      </label>
+      <label class="aac__face-check">
+        <input type="checkbox" id="aac_enab_topo" checked>
+        <span class="aac__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L20 8 L20 16 L4 16 Z"/><line x1="4" y1="8" x2="20" y2="8" stroke-width="2.5"/></svg></span>
+        <span class="aac__face-check-label">Topo</span>
+      </label>
+      <label class="aac__face-check">
+        <input type="checkbox" id="aac_enab_base">
+        <span class="aac__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8 L20 8 L20 16 L4 16 Z"/><line x1="4" y1="16" x2="20" y2="16" stroke-width="2.5"/></svg></span>
+        <span class="aac__face-check-label">Base</span>
+      </label>
+      <label class="aac__face-check">
+        <input type="checkbox" id="aac_enab_esq" checked>
+        <span class="aac__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L8 20 L16 20 L16 4 Z"/><line x1="8" y1="4" x2="8" y2="20" stroke-width="2.5"/></svg></span>
+        <span class="aac__face-check-label">Lateral esquerda</span>
+      </label>
+      <label class="aac__face-check">
+        <input type="checkbox" id="aac_enab_dir" checked>
+        <span class="aac__face-check-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 L8 20 L16 20 L16 4 Z"/><line x1="16" y1="4" x2="16" y2="20" stroke-width="2.5"/></svg></span>
+        <span class="aac__face-check-label">Lateral direita</span>
+      </label>
+    </div>
+  </section>
+
+  <!-- ═════════ ACM (cor + espessura, color picker dinâmico do catálogo) ═════════ -->
+  <section class="aac__section" id="aac_acm_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">ACM</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__row">
+      <div class="field">
+        <label class="field__label">Espessura ACM (mm)</label>
+        <div class="aac__select-wrap">
+          <select class="aac__select" id="aac_acm_esp">
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label">Cor selecionada</label>
+        <div class="aac__cor-display" id="aac_cor_display">
+          <span class="aac__cor-swatch" id="aac_cor_swatch"></span>
+          <span class="aac__cor-nome" id="aac_cor_nome">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="aac__color-tabs" id="aac_color_tabs"></div>
+    <div class="aac__color-grid" id="aac_color_grid"></div>
+    <input type="hidden" id="aac_cor_acm" value="Branco Brilho (VX103)">
+  </section>
+
+  <!-- ═════════ CHAPA (tamanho + orientação) ═════════ -->
+  <section class="aac__section" id="aac_chapa_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">CHAPA ACM</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__row">
+      <div class="field">
+        <label class="field__label" data-i18n="aa.acm.chapa_size">Tamanho da chapa</label>
+        <div class="aac__select-wrap">
+          <select class="aac__select" id="aac_chapa_preset" onchange="AutoAcmCurvo.onChapaPresetChange()">
+            <option value="5000x1220" selected data-i18n="aa.acm.chapa_preset.br_5000_1220">5000 × 1220 mm (BR)</option>
+            <option value="5000x1500" data-i18n="aa.acm.chapa_preset.br_5000_1500">5000 × 1500 mm (BR grande)</option>
+            <option value="2440x1220" data-i18n="aa.acm.chapa_preset.us_2440_1220">2440 × 1220 mm (US/EU 8'×4')</option>
+            <option value="3200x1500" data-i18n="aa.acm.chapa_preset.eu_3200_1500">3200 × 1500 mm (EU grande)</option>
+            <option value="custom" data-i18n="aa.acm.chapa_preset.custom">Customizado…</option>
+          </select>
+        </div>
+        <input type="hidden" id="aac_chapa_larg" value="1220">
+      </div>
+      <div class="field">
+        <label class="field__label">Orientação</label>
+        <div class="aac__pills" role="radiogroup">
+          <button type="button" class="aac__pill is-active" data-val="horizontal" onclick="AutoAcmCurvo.setOrient('horizontal')">
+            <span>Horizontal</span>
+          </button>
+          <button type="button" class="aac__pill" data-val="vertical" onclick="AutoAcmCurvo.setOrient('vertical')">
+            <span>Vertical</span>
+          </button>
+        </div>
+        <input type="hidden" id="aac_chapa_orient" value="horizontal">
+        <div class="aac__orient-hint" id="aac_orient_hint" hidden></div>
+      </div>
+    </div>
+    <div class="aac__row" id="aac_chapa_custom_wrap" hidden>
+      <div class="field">
+        <label class="field__label" data-i18n="aa.acm.chapa_custom.comp">Comprimento (mm)</label>
+        <input type="number" id="aac_chapa_comp_custom" value="5000" min="500" max="20000" step="10" oninput="AutoAcmCurvo.onChapaCustomChange()" class="aac__input">
+      </div>
+      <div class="field">
+        <label class="field__label" data-i18n="aa.acm.chapa_custom.larg">Largura (mm)</label>
+        <input type="number" id="aac_chapa_larg_custom" value="1220" min="300" max="3000" step="10" oninput="AutoAcmCurvo.onChapaCustomChange()" class="aac__input">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ METALON (perfil) ═════════ -->
+  <section class="aac__section" id="aac_metalon_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">METALON</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__row">
+      <div class="field">
+        <label class="field__label">Largura (mm)</label>
+        <input class="aac__input" type="number" id="aac_mw" value="20" min="15" max="120" step="5">
+      </div>
+      <div class="field">
+        <label class="field__label">Altura (mm)</label>
+        <input class="aac__input" type="number" id="aac_mh" value="20" min="15" max="120" step="5">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ EMENDAS (perfil + alinhamento) ═════════ -->
+  <section class="aac__section" id="aac_emenda_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">EMENDAS</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__row">
+      <div class="field">
+        <label class="field__label">Largura perfil (mm)</label>
+        <input class="aac__input" type="number" id="aac_ew" value="30" min="10" max="80" step="5">
+      </div>
+      <div class="field">
+        <label class="field__label">Altura perfil (mm)</label>
+        <input class="aac__input" type="number" id="aac_eh" value="20" min="10" max="80" step="5">
+      </div>
+    </div>
+    <div class="field">
+      <label class="field__label">Alinhamento das emendas</label>
+      <div class="aac__radio-row aac__radio-row--wrap">
+        <label class="aac__radio"><input type="radio" name="aac_em_align" value="esquerda" checked><span>Esquerda</span></label>
+        <label class="aac__radio"><input type="radio" name="aac_em_align" value="central"><span>Central</span></label>
+        <label class="aac__radio"><input type="radio" name="aac_em_align" value="direita"><span>Direita</span></label>
+        <label class="aac__radio"><input type="radio" name="aac_em_align" value="simetrica"><span>Simétrica</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ JUNTAS (seca/dilatação + cor) ═════════ -->
+  <section class="aac__section" id="aac_junta_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">JUNTAS</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="field">
+      <label class="field__label">Tipo</label>
+      <div class="aac__radio-row">
+        <label class="aac__radio"><input type="radio" name="aac_junta_tipo" value="seca" checked><span>Seca</span></label>
+        <label class="aac__radio"><input type="radio" name="aac_junta_tipo" value="dilatacao"><span>Dilatação</span></label>
+      </div>
+    </div>
+    <div class="aac__row" id="aac_junta_dil_row">
+      <div class="field">
+        <label class="field__label">Folga (mm)</label>
+        <input class="aac__input" type="number" id="aac_junta_mm" value="8" min="2" max="30" step="1">
+      </div>
+      <div class="field">
+        <label class="field__label">Cor da junta</label>
+        <div class="aac__junta-swatches" id="aac_junta_swatches"></div>
+        <input type="hidden" id="aac_cor_junta" value="Preto">
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ FITA DUPLA ═════════ -->
+  <section class="aac__section" id="aac_fita_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">FITA DUPLA-FACE</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <label class="aac__toggle-row">
+      <input type="checkbox" id="aac_inc_fita" checked>
+      <span>Incluir fita dupla-face</span>
+    </label>
+    <div class="field" id="aac_fita_cor_row">
+      <label class="field__label">Cor da fita</label>
+      <div class="aac__junta-swatches" id="aac_fita_swatches"></div>
+      <input type="hidden" id="aac_cor_fita" value="Cyan">
+    </div>
+    <div class="aac__row" id="aac_fita_dims">
+      <div class="field">
+        <label class="field__label">Largura (mm)</label>
+        <div class="aac__select-wrap">
+          <select class="aac__select" id="aac_fl">
+            <option value="12" selected>12</option>
+            <option value="19">19</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label">Espessura (mm)</label>
+        <div class="aac__fita-esp-row">
+          <div class="aac__select-wrap">
+            <select class="aac__select" id="aac_fe">
+              <option value="0.5">0.5</option>
+              <option value="0.9" selected>0.9</option>
+              <option value="1.2">1.2</option>
+              <option value="1.6">1.6</option>
+            </select>
+          </div>
+          <button type="button" class="aac__fita-esp-add" id="aac_fe_add" onclick="AutoAcmCurvo.addFitaEsp()" title="Salvar nova espessura">+</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═════════ PREVIEW 2D PLANIFICADO ═════════ -->
+  <section class="aac__section" id="aac_preview2d_section" hidden>
+    <div class="aac__section-header">
+      <h3 class="aac__section-title">Preview planificado</h3>
+      <p class="aac__section-desc">Layout "aberto" da fachada com emendas, dobras e juntas. Arraste as emendas ou clique para cortar em novas posições.</p>
+    </div>
+
+    <!-- Toolbar de ferramentas (idêntico ao Auto-ACM normal) -->
+    <div class="aac__preview-toolbar">
+      <span class="aac__preview-toolbar-label">Ferramentas</span>
+      <button type="button" class="aac__tool is-active" data-plan-tool="pan" onclick="AutoAcmCurvo.setPlanTool('pan')" title="Navegar (shift+drag = pan, wheel = zoom)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l-3 3 3 3"/><path d="M9 5l3-3 3 3"/><path d="M15 19l3-3-3-3"/><path d="M19 9l3 3-3 3"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+        <span>Navegar</span>
+      </button>
+      <button type="button" class="aac__tool" data-plan-tool="moveH" onclick="AutoAcmCurvo.setPlanTool('moveH')" title="Mover emenda vertical (arraste horizontal)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="8,6 2,12 8,18"/><polyline points="16,6 22,12 16,18"/></svg>
+        <span>Mover ↔</span>
+      </button>
+      <button type="button" class="aac__tool" data-plan-tool="moveV" onclick="AutoAcmCurvo.setPlanTool('moveV')" title="Mover emenda horizontal (arraste vertical)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6,8 12,2 18,8"/><polyline points="6,16 12,22 18,16"/></svg>
+        <span>Mover ↕</span>
+      </button>
+      <button type="button" class="aac__tool" data-plan-tool="cutV" onclick="AutoAcmCurvo.setPlanTool('cutV')" title="Cortar verticalmente (adiciona emenda vertical)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/><line x1="12" y1="12" x2="12" y2="22"/></svg>
+        <span>Cortar ↕</span>
+      </button>
+      <button type="button" class="aac__tool" data-plan-tool="cutH" onclick="AutoAcmCurvo.setPlanTool('cutH')" title="Cortar horizontalmente (adiciona emenda horizontal)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        <span>Cortar ↔</span>
+      </button>
+      <button type="button" class="aac__tool" onclick="AutoAcmCurvo.planResetView()" title="Ajustar zoom/pan à tela">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+        <span>Ajustar</span>
+      </button>
+      <button type="button" class="aac__tool aac__tool--danger" onclick="AutoAcmCurvo.planReset()" title="Resetar todas as emendas customizadas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        <span>Resetar</span>
+      </button>
+    </div>
+
+    <!-- Toggles de camadas (segunda linha) -->
+    <div class="aac__preview-toolbar">
+      <span class="aac__preview-toolbar-label">Mostrar</span>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac2d_emendas"  checked onchange="AutoAcmCurvo.scheduleRedraw2D()"><span>Emendas</span></label>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac2d_dims"     checked onchange="AutoAcmCurvo.scheduleRedraw2D()"><span>Dimensões</span></label>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac2d_labels"   checked onchange="AutoAcmCurvo.scheduleRedraw2D()"><span>Rótulos</span></label>
+      <button type="button" class="aac__view-btn" onclick="AutoAcmCurvo.dumpEnvelope()" style="margin-left:auto;">📋 Copiar envelope JSON</button>
+    </div>
+
+    <div class="aac__canvas-wrap">
+      <canvas id="aac_preview2d" class="aac__canvas-2d"></canvas>
+    </div>
+  </section>
+
+  <!-- ═════════ PREVIEW 3D ISOMÉTRICO ═════════ -->
+  <section class="aac__section" id="aac_preview3d_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">PREVIEW 3D ISOMÉTRICO</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <p class="aac__section-hint">Visualização volumétrica. Arraste = orbitar · Shift+arraste = pan · Scroll = zoom.</p>
+
+    <!-- Linha 1: Camadas + Vistas + Câmera (mantida) -->
+    <div class="aac__preview-toolbar">
+      <span class="aac__preview-toolbar-label">Camadas</span>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac3d_acm"  checked onchange="AutoAcmCurvo.scheduleRedraw3D()"><span>ACM</span></label>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac3d_met"  checked onchange="AutoAcmCurvo.scheduleRedraw3D()"><span>Metalon</span></label>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac3d_em"   checked onchange="AutoAcmCurvo.scheduleRedraw3D()"><span>Emendas</span></label>
+      <label class="aac__layer-chk"><input type="checkbox" id="aac3d_fita" checked onchange="AutoAcmCurvo.scheduleRedraw3D()"><span>Fita</span></label>
+
+      <div class="aac__preview3d-views">
+        <button type="button" class="aac__view-btn" data-view="front" title="Frontal" onclick="AutoAcmCurvo.setView3D('front')">Frontal</button>
+        <button type="button" class="aac__view-btn" data-view="side"  title="Lateral" onclick="AutoAcmCurvo.setView3D('side')">Lateral</button>
+        <button type="button" class="aac__view-btn" data-view="top"   title="Topo" onclick="AutoAcmCurvo.setView3D('top')">Topo</button>
+        <button type="button" class="aac__view-btn is-active" data-view="iso" title="Isométrica" onclick="AutoAcmCurvo.setView3D('iso')">Iso</button>
+        <button type="button" class="aac__view-btn" data-view="fit"   title="Ajustar" onclick="AutoAcmCurvo.setView3D('fit')">Fit</button>
+      </div>
+
+      <div class="aac__preview3d-cam">
+        <button type="button" class="aac__tool-icon" title="Girar esquerda" onclick="AutoAcmCurvo.rot3D(-15,0)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 4.2-7.6"/><polyline points="3 4 3 10 9 10"/></svg>
+        </button>
+        <button type="button" class="aac__tool-icon" title="Girar direita" onclick="AutoAcmCurvo.rot3D(15,0)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-4.2-7.6"/><polyline points="21 4 21 10 15 10"/></svg>
+        </button>
+        <button type="button" class="aac__tool-icon" title="Zoom +" onclick="AutoAcmCurvo.zoom3D(1.2)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button type="button" class="aac__tool-icon" title="Zoom −" onclick="AutoAcmCurvo.zoom3D(0.8)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        </button>
+        <button type="button" class="aac__tool-icon" title="Reset câmera" onclick="AutoAcmCurvo.reset3D()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Linha 2: Ferramentas (Orbitar/Tesoura/Mover/Simétrico/Magnet/Adicionar) -->
+    <div class="aac__preview-toolbar">
+      <span class="aac__preview-toolbar-label">Ferramentas</span>
+      <button type="button" class="aac__tool is-active" data-tool3d="orbit" onclick="AutoAcmCurvo.setTool3D('orbit')" title="Orbitar (default)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><ellipse cx="12" cy="12" rx="10" ry="4"/></svg>
+        <span>Orbitar</span>
+      </button>
+      <button type="button" class="aac__tool" data-tool3d="cut" onclick="AutoAcmCurvo.setTool3D('cut')" title="Tesoura — clique numa peça custom pra deletar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        <span>Tesoura</span>
+      </button>
+      <button type="button" class="aac__tool" data-tool3d="moveH" onclick="AutoAcmCurvo.setTool3D('moveH')" title="Mover horizontalmente uma peça custom">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
+        <span>Mover H</span>
+      </button>
+      <button type="button" class="aac__tool" data-tool3d="moveV" onclick="AutoAcmCurvo.setTool3D('moveV')" title="Mover verticalmente uma peça custom">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="6,8 12,2 18,8"/><polyline points="6,16 12,22 18,16"/></svg>
+        <span>Mover V</span>
+      </button>
+      <button type="button" class="aac__tool" id="aac3d_sym_btn" onclick="AutoAcmCurvo.toggleSym()" title="Modo simétrico — peça espelhada na face oposta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><path d="M8 7l-4 5 4 5"/><path d="M16 7l4 5-4 5"/></svg>
+        <span>Simétrico</span>
+      </button>
+      <button type="button" class="aac__tool aac__tool--icon" id="aac3d_magnet_btn" onclick="AutoAcmCurvo.toggleMagnet()" title="Ímã — encaixa em emendas/dobras durante o placement">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v8a6 6 0 0 0 12 0V4"/><line x1="6" y1="8" x2="10" y2="8"/><line x1="14" y1="8" x2="18" y2="8"/></svg>
+      </button>
+
+      <button type="button" class="aac__tool" id="aac3d_undo_btn" onclick="AutoAcmCurvo.desfazer()" disabled title="Desfazer última alteração (Ctrl+Z) — volta corte/mover/adicionar até o estado gerado">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        <span>Desfazer</span>
+      </button>
+
+      <div class="aac__add-wrap">
+        <button type="button" class="aac__tool aac__tool--accent" id="aac3d_add_btn" onclick="AutoAcmCurvo.toggleAddPop(event)" title="Adicionar ferragem custom">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Adicionar</span>
+        </button>
+
+        <div class="aac__add-pop" id="aac3d_add_pop" hidden>
+          <div class="aac__add-pop-header">
+            <span>Nova ferragem</span>
+            <button type="button" class="aac__add-pop-close" onclick="AutoAcmCurvo.closeAddPop()" title="Fechar">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+
+          <div class="aac__add-pop-row">
+            <span class="aac__add-pop-label">Perfil (mm)</span>
+            <div class="aac__add-pop-profile">
+              <label class="aac__add-pop-field">
+                <span>Largura</span>
+                <input type="number" id="aac3d_add_pw" min="5" max="200" step="1" value="20">
+              </label>
+              <span class="aac__add-pop-x">×</span>
+              <label class="aac__add-pop-field">
+                <span>Altura</span>
+                <input type="number" id="aac3d_add_ph" min="5" max="200" step="1" value="20">
+              </label>
+            </div>
+          </div>
+
+          <div class="aac__add-pop-row">
+            <span class="aac__add-pop-label">Tipo</span>
+            <div class="aac__add-pop-opts">
+              <button type="button" class="aac__add-opt is-active" data-add-cat="met" onclick="AutoAcmCurvo.setAddCat('met')">Estrutura</button>
+              <button type="button" class="aac__add-opt" data-add-cat="em" onclick="AutoAcmCurvo.setAddCat('em')">Emenda</button>
+            </div>
+          </div>
+
+          <div class="aac__add-pop-row">
+            <span class="aac__add-pop-label">Orientação</span>
+            <div class="aac__add-pop-opts">
+              <button type="button" class="aac__add-opt is-active" data-add-orient="v" onclick="AutoAcmCurvo.setAddOrient('v')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/></svg>
+                <span>Vertical</span>
+              </button>
+              <button type="button" class="aac__add-opt" data-add-orient="h" onclick="AutoAcmCurvo.setAddOrient('h')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+                <span>Horizontal</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="aac__add-pop-row">
+            <span class="aac__add-pop-label">Face</span>
+            <select class="aac__add-pop-select" id="aac3d_add_face">
+              <!-- Opções populadas via AutoAcmCurvo._fillAddFaces() -->
+            </select>
+          </div>
+
+          <div class="aac__add-pop-row">
+            <label class="aac__add-pop-check">
+              <input type="checkbox" id="aac3d_add_fita" checked>
+              <span>Incluir fita dupla-face entre a peça e o ACM</span>
+            </label>
+          </div>
+
+          <div class="aac__add-pop-actions">
+            <button type="button" class="btn btn--secondary btn--sm" onclick="AutoAcmCurvo.closeAddPop()">Cancelar</button>
+            <button type="button" class="btn btn--primary btn--sm" id="aac3d_add_confirm" onclick="AutoAcmCurvo.confirmAdd()">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Adicionar</span>
+            </button>
+          </div>
+
+          <p class="aac__add-pop-hint">Versão atual: a peça é salva e gerada no SketchUp (Ruby honra). Mover/Tesoura no preview 3D ainda em desenvolvimento.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="aac__canvas-wrap">
+      <canvas id="aac_preview3d" class="aac__canvas-3d"></canvas>
+    </div>
+
+    <!-- Lista de ferragens custom adicionadas -->
+    <div class="aac__custom-pieces" id="aac_custom_pieces" hidden>
+      <h4>Ferragens adicionadas</h4>
+      <ul id="aac_custom_pieces_list"></ul>
+    </div>
+  </section>
+
+  <!-- ═════════ RESUMO ═════════ -->
+  <section class="aac__section" id="aac_resumo_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">RESUMO</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__resumo-grid" id="aac_resumo_grid"></div>
+  </section>
+
+  <!-- ═════════ GERAR ═════════ -->
+  <section class="aac__gerar" id="aac_gerar_section" hidden>
+    <button class="btn btn--primary btn--lg btn--block aac__gerar-btn" id="aac_btn_gerar" onclick="AutoAcmCurvo.gerar()">
+      <svg class="icon icon-lg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span>Gerar no SketchUp</span>
+    </button>
+  </section>
+
+  <!-- ═════════ QUANTITATIVO ═════════ -->
+  <section class="aac__quant" id="aac_quant_section" hidden>
+    <div class="section-header__label-row">
+      <span class="section-header__label">QUANTITATIVO</span>
+      <div class="section-header__divider"></div>
+    </div>
+    <div class="aac__quant-grid" id="aac_quant_grid"></div>
+    <div id="aac_quant_faces" class="aac__quant-faces"></div>
+  </section>
+
+</div>
