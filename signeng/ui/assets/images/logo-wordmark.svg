@@ -1,0 +1,7 @@
+<svg viewBox="0 0 180 32" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0"  y="2"  width="12" height="12" rx="2" fill="currentColor"/>
+  <rect x="14" y="2"  width="14" height="12" rx="2" fill="currentColor"/>
+  <rect x="0"  y="16" width="14" height="14" rx="2" fill="currentColor"/>
+  <rect x="16" y="18" width="12" height="12" rx="2" fill="currentColor" opacity="0.35"/>
+  <text x="40" y="22" font-family="Geist, Inter, sans-serif" font-weight="700" font-size="20" fill="currentColor" letter-spacing="-0.5">SignEng</text>
+</svg>
