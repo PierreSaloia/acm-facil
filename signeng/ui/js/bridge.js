@@ -21,23 +21,45 @@ const Bridge = {
    * @returns {Promise<object>}
    */
   call(action, payload = {}, timeoutMs = 60000) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const res = await fetch(`/api/${action}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        
-        if (data && data.blocked === true && !(typeof Auth !== 'undefined' && Auth.state && Auth.state.user && Auth.state.user.local_id === 'offline-local-user') && typeof App !== 'undefined' && App.handleBlocked) {
-          try { App.handleBlocked(data); } catch (e) { console.warn('handleBlocked falhou:', e); }
+    return new Promise((resolve, reject) => {
+      const bridge = window.sketchup;
+
+      // HtmlDialog do SketchUp expõe callbacks Ruby em window.sketchup.
+      // O fallback HTTP existe apenas para o preview web do projeto.
+      if (bridge && typeof bridge[action] === 'function') {
+        const id = `bridge_${++Bridge._lastId}`;
+        const full = { ...payload, id };
+        const timer = setTimeout(() => {
+          delete Bridge._callbacks[id];
+          reject(new Error(`Tempo esgotado ao executar ${action}`));
+        }, timeoutMs);
+        Bridge._callbacks[id] = { resolve, reject, timer };
+        try {
+          bridge[action](JSON.stringify(full));
+        } catch (e) {
+          clearTimeout(timer);
+          delete Bridge._callbacks[id];
+          reject(e);
         }
-        
-        resolve(data);
-      } catch (e) {
-        reject(e);
+        return;
       }
+
+      fetch(`/api/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        })
+        .then(data => {
+          if (data && data.blocked === true && !(typeof Auth !== 'undefined' && Auth.state && Auth.state.user && Auth.state.user.local_id === 'offline-local-user') && typeof App !== 'undefined' && App.handleBlocked) {
+            try { App.handleBlocked(data); } catch (e) { console.warn('handleBlocked falhou:', e); }
+          }
+          resolve(data);
+        })
+        .catch(reject);
     });
   },
 
