@@ -4,7 +4,7 @@ require 'base64'
 require 'fileutils'
 
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — main.rb
+# SignEng — main.rb
 # ═══════════════════════════════════════════════════════════════════════════
 # Inicializa o diálogo HTML, registra callbacks, cria menu e toolbar.
 # ═══════════════════════════════════════════════════════════════════════════
@@ -13,7 +13,7 @@ module ACMFacil
   PLUGIN_DIR = File.dirname(__FILE__)
   UI_DIR     = File.join(PLUGIN_DIR, 'ui')
   ICONS_DIR  = File.join(PLUGIN_DIR, 'resources', 'toolbar_icons')
-  DEFAULT_NS = "ACMFacil".freeze
+  DEFAULT_NS = "SignEng".freeze
 
   # ── Core: versão, firebase client, auth, cores e geometria compartilhadas ──
   # Sketchup::require (não `require`): carrega tanto .rb (dev) quanto .rbe
@@ -50,13 +50,13 @@ module ACMFacil
       begin
         @dialog.execute_script("if(typeof App!=='undefined'&&App.revalidate)App.revalidate();")
       rescue => e
-        puts "[ACMFacil] revalidate-on-reopen falhou: #{e.message}"
+        puts "[SignEng] revalidate-on-reopen falhou: #{e.message}"
       end
       return
     end
 
     @dialog = UI::HtmlDialog.new(
-      dialog_title:    "ACMFacil v#{Core::VERSION}",
+      dialog_title:    "SignEng v#{Core::VERSION}",
       preferences_key: "com.acmfacil.plugin",
       width:           1100,
       height:          720,
@@ -86,7 +86,7 @@ module ACMFacil
     begin
       @dialog.set_position(100, 60)
     rescue => e
-      puts "[ACMFacil] set_position inicial falhou: #{e.message}"
+      puts "[SignEng] set_position inicial falhou: #{e.message}"
     end
   end
 
@@ -115,11 +115,11 @@ module ACMFacil
           begin
             dlg.bring_to_front
           rescue => e
-            puts "[ACMFacil] bring_to_front after login falhou: #{e.message}"
+            puts "[SignEng] bring_to_front after login falhou: #{e.message}"
           end
         end
       rescue => e
-        puts "[ACMFacil] auth_login callback exception: #{e.message}"
+        puts "[SignEng] auth_login callback exception: #{e.message}"
         puts e.backtrace.first(5).join("\n")
         begin
           resolver(dlg, (data && data["id"]), { ok: false, code: "auth.exception", error: e.message })
@@ -263,7 +263,7 @@ module ACMFacil
           presets = parsed if parsed.is_a?(Array)
         end
       rescue => e
-        puts "[ACMFacil] presets_get parse erro: #{e.message}"
+        puts "[SignEng] presets_get parse erro: #{e.message}"
       end
       resolver(dlg, data["id"], { ok: true, presets: presets })
     end
@@ -278,18 +278,18 @@ module ACMFacil
         json_str = JSON.generate(presets)
         encoded  = Base64.strict_encode64(json_str)
         Sketchup.write_default(DEFAULT_NS, key, encoded)
-        puts "[ACMFacil] presets_save ok: #{presets.length} preset(s), #{encoded.bytesize} bytes"
+        puts "[SignEng] presets_save ok: #{presets.length} preset(s), #{encoded.bytesize} bytes"
         resolver(dlg, data["id"], { ok: true, count: presets.length })
       rescue => e
-        puts "[ACMFacil] presets_save erro: #{e.message}"
+        puts "[SignEng] presets_save erro: #{e.message}"
         resolver(dlg, data["id"], { ok: false, error: e.message })
       end
     end
 
     # ══════════════ EMPRESA (cadastro do escritório) ══════════════
     # Persistência em arquivo JSON: logo (base64 data URI) é grande demais
-    # pra Sketchup.write_default. Arquivo em %APPDATA%/ACMFacil/empresa.json
-    # (Windows) ou ~/.acmfacil/empresa.json (Mac/Linux).
+    # pra Sketchup.write_default. Arquivo em %APPDATA%/SignEng/empresa.json
+    # (Windows) ou ~/.signeng/empresa.json (Mac/Linux).
     dlg.add_action_callback("empresa_get") do |_ctx, json|
       data = parse_payload(json)
       begin
@@ -302,7 +302,7 @@ module ACMFacil
         end
         resolver(dlg, data["id"], { ok: true, empresa: empresa })
       rescue => e
-        puts "[ACMFacil] empresa_get erro: #{e.message}"
+        puts "[SignEng] empresa_get erro: #{e.message}"
         resolver(dlg, data["id"], { ok: true, empresa: {} })
       end
     end
@@ -314,10 +314,10 @@ module ACMFacil
         path = empresa_file_path
         FileUtils.mkdir_p(File.dirname(path))
         File.open(path, 'wb') { |f| f.write(JSON.generate(empresa)) }
-        puts "[ACMFacil] empresa_save ok: #{path}"
+        puts "[SignEng] empresa_save ok: #{path}"
         resolver(dlg, data["id"], { ok: true })
       rescue => e
-        puts "[ACMFacil] empresa_save erro: #{e.message}"
+        puts "[SignEng] empresa_save erro: #{e.message}"
         resolver(dlg, data["id"], { ok: false, error: e.message })
       end
     end
@@ -345,7 +345,7 @@ module ACMFacil
       resolver(dlg, data["id"], {
         ok:      true,
         version: Core::VERSION,
-        plugin:  "ACMFacil"
+        plugin:  "SignEng"
       })
     end
 
@@ -390,7 +390,7 @@ module ACMFacil
           code:         has_update ? "app.update.available" : "app.update.uptodate"
         })
       rescue => e
-        puts "[ACMFacil] app_check_update erro: #{e.message}"
+        puts "[SignEng] app_check_update erro: #{e.message}"
         resolver(dlg, data["id"], {
           ok:    false,
           code:  "app.update.error",
@@ -474,7 +474,7 @@ module ACMFacil
           presets = parsed if parsed.is_a?(Array)
         end
       rescue => e
-        puts "[ACMFacil] presets_get parse erro: #{e.message}"
+        puts "[SignEng] presets_get parse erro: #{e.message}"
       end
       resolver(dlg, data["id"], { ok: true, presets: presets })
     end
@@ -489,18 +489,18 @@ module ACMFacil
         json_str = JSON.generate(presets)
         encoded  = Base64.strict_encode64(json_str)
         Sketchup.write_default(DEFAULT_NS, key, encoded)
-        puts "[ACMFacil] presets_save ok: #{presets.length} preset(s), #{encoded.bytesize} bytes"
+        puts "[SignEng] presets_save ok: #{presets.length} preset(s), #{encoded.bytesize} bytes"
         resolver(dlg, data["id"], { ok: true, count: presets.length })
       rescue => e
-        puts "[ACMFacil] presets_save erro: #{e.message}"
+        puts "[SignEng] presets_save erro: #{e.message}"
         resolver(dlg, data["id"], { ok: false, error: e.message })
       end
     end
 
     # ══════════════ EMPRESA (cadastro do escritório) ══════════════
     # Persistência em arquivo JSON: logo (base64 data URI) é grande demais
-    # pra Sketchup.write_default. Arquivo em %APPDATA%/ACMFacil/empresa.json
-    # (Windows) ou ~/.acmfacil/empresa.json (Mac/Linux).
+    # pra Sketchup.write_default. Arquivo em %APPDATA%/SignEng/empresa.json
+    # (Windows) ou ~/.signeng/empresa.json (Mac/Linux).
     dlg.add_action_callback("empresa_get") do |_ctx, json|
       data = parse_payload(json)
       begin
@@ -513,7 +513,7 @@ module ACMFacil
         end
         resolver(dlg, data["id"], { ok: true, empresa: empresa })
       rescue => e
-        puts "[ACMFacil] empresa_get erro: #{e.message}"
+        puts "[SignEng] empresa_get erro: #{e.message}"
         resolver(dlg, data["id"], { ok: true, empresa: {} })
       end
     end
@@ -525,10 +525,10 @@ module ACMFacil
         path = empresa_file_path
         FileUtils.mkdir_p(File.dirname(path))
         File.open(path, 'wb') { |f| f.write(JSON.generate(empresa)) }
-        puts "[ACMFacil] empresa_save ok: #{path}"
+        puts "[SignEng] empresa_save ok: #{path}"
         resolver(dlg, data["id"], { ok: true })
       rescue => e
-        puts "[ACMFacil] empresa_save erro: #{e.message}"
+        puts "[SignEng] empresa_save erro: #{e.message}"
         resolver(dlg, data["id"], { ok: false, error: e.message })
       end
     end
@@ -556,7 +556,7 @@ module ACMFacil
       resolver(dlg, data["id"], {
         ok:      true,
         version: Core::VERSION,
-        plugin:  "ACMFacil"
+        plugin:  "SignEng"
       })
     end
 
@@ -601,7 +601,7 @@ module ACMFacil
           code:         has_update ? "app.update.available" : "app.update.uptodate"
         })
       rescue => e
-        puts "[ACMFacil] app_check_update erro: #{e.message}"
+        puts "[SignEng] app_check_update erro: #{e.message}"
         resolver(dlg, data["id"], {
           ok:    false,
           code:  "app.update.error",
@@ -1107,7 +1107,7 @@ module ACMFacil
           next
         end
 
-        model.start_operation("Duplicar módulo ACMFacil", true)
+        model.start_operation("Duplicar módulo SignEng", true)
 
         # Calcula offset X baseado no conjunto inteiro de módulos
         max_x = 0.0
@@ -1194,7 +1194,7 @@ module ACMFacil
         d = mm_to_in.call(d_mm)
 
         model = Sketchup.active_model
-        model.start_operation("Criar caixa ACMFacil", true)
+        model.start_operation("Criar caixa SignEng", true)
 
         # Resolve as entidades existentes pra calcular offset X
         existing_entities = []
@@ -1508,7 +1508,7 @@ module ACMFacil
     begin
       dlg.execute_script("Bridge._resolve(#{js_id}, #{js_data})")
     rescue => e
-      puts "[ACMFacil] resolver execute_script falhou: #{e.message}"
+      puts "[SignEng] resolver execute_script falhou: #{e.message}"
     end
   end
 
@@ -1525,11 +1525,11 @@ module ACMFacil
   end
 
   # Caminho do arquivo de cadastro da empresa.
-  #   Windows: %APPDATA%\ACMFacil\empresa.json
-  #   Mac/Linux: ~/.acmfacil/empresa.json
+  #   Windows: %APPDATA%\SignEng\empresa.json
+  #   Mac/Linux: ~/.signeng/empresa.json
   def self.empresa_file_path
-    base = ENV['APPDATA'] || File.join(Dir.home, '.acmfacil')
-    dir  = ENV['APPDATA'] ? File.join(base, 'ACMFacil') : base
+    base = ENV['APPDATA'] || File.join(Dir.home, '.signeng')
+    dir  = ENV['APPDATA'] ? File.join(base, 'SignEng') : base
     File.join(dir, 'empresa.json')
   end
 
@@ -1561,7 +1561,7 @@ module ACMFacil
       @dialog.close
       @dialog = nil
     end
-    UI.messagebox("ACMFacil v#{Core::VERSION}: Ruby recarregado. Abra o diálogo novamente.")
+    UI.messagebox("SignEng v#{Core::VERSION}: Ruby recarregado. Abra o diálogo novamente.")
   end
 
   # ─────────────────────────────────────────────────────────────────────────
@@ -1582,7 +1582,7 @@ module ACMFacil
         @dialog.execute_script(js)
         @dialog.bring_to_front
       rescue => e
-        puts "[ACMFacil] abrir_modulo(#{mod_id}) falhou: #{e.message}"
+        puts "[SignEng] abrir_modulo(#{mod_id}) falhou: #{e.message}"
       end
     else
       # Painel fechado: o boot consome o pendente (ui_pending_module) e o
@@ -1597,13 +1597,13 @@ module ACMFacil
   # ─────────────────────────────────────────────────────────────────────────
   unless file_loaded?(__FILE__)
     menu = UI.menu("Plugins")
-    menu.add_item("ACMFacil") { ACMFacil.abrir }
-    menu.add_item("ACMFacil — Reload (DEV)") { ACMFacil.reload_dev }
+    menu.add_item("SignEng") { ACMFacil.abrir }
+    menu.add_item("SignEng — Reload (DEV)") { ACMFacil.reload_dev }
 
-    toolbar = UI::Toolbar.new("ACMFacil")
-    cmd = UI::Command.new("ACMFacil") { ACMFacil.abrir }
-    cmd.tooltip         = "ACMFacil — Gerador de Fachadas ACM"
-    cmd.status_bar_text = "Abre o plugin ACMFacil"
+    toolbar = UI::Toolbar.new("SignEng")
+    cmd = UI::Command.new("SignEng") { ACMFacil.abrir }
+    cmd.tooltip         = "SignEng — Gerador de Fachadas ACM"
+    cmd.status_bar_text = "Abre o plugin SignEng"
     cmd.small_icon      = File.join(ICONS_DIR, 'icon_24.svg')
     cmd.large_icon      = File.join(ICONS_DIR, 'icon_32.svg')
     toolbar.add_item(cmd)
@@ -1619,7 +1619,7 @@ module ACMFacil
       ['corte_encaixe',  'Corte & Encaixe', 'Encaixes dente-a-dente e nesting com export SVG/DXF']
     ]
     modulos_toolbar.each do |mid, nome, desc|
-      c = UI::Command.new("ACMFacil — #{nome}") { ACMFacil.abrir_modulo(mid) }
+      c = UI::Command.new("SignEng — #{nome}") { ACMFacil.abrir_modulo(mid) }
       c.tooltip         = "#{nome} — #{desc}"
       c.status_bar_text = desc
       c.small_icon      = File.join(ICONS_DIR, "#{mid}_24.svg")
@@ -1627,14 +1627,14 @@ module ACMFacil
       toolbar.add_item(c)
     end
 
-    cmd_alinhar = UI::Command.new("ACMFacil — Alinhar") { ACMFacil::Generator::Alinhar.ativar }
+    cmd_alinhar = UI::Command.new("SignEng — Alinhar") { ACMFacil::Generator::Alinhar.ativar }
     cmd_alinhar.tooltip         = "Alinhar — objeto 2 alinha ao objeto 1 (fixo)"
     cmd_alinhar.status_bar_text = "Alinha um grupo/componente a outro por borda, centro e faceamento"
     cmd_alinhar.small_icon      = File.join(ICONS_DIR, 'alinhar_24.svg')
     cmd_alinhar.large_icon      = File.join(ICONS_DIR, 'alinhar_32.svg')
     toolbar.add_item(cmd_alinhar)
 
-    cmd_luminoso = UI::Command.new("ACMFacil — Luminoso") { ACMFacil::Generator::Luminoso.ativar }
+    cmd_luminoso = UI::Command.new("SignEng — Luminoso") { ACMFacil::Generator::Luminoso.ativar }
     cmd_luminoso.tooltip         = "Luminoso — gera luminoso em ACM (redondo/quadrado/retangular)"
     cmd_luminoso.status_bar_text = "Gera luminoso paramétrico em ACM como componente editável"
     cmd_luminoso.small_icon      = File.join(ICONS_DIR, 'luminoso_24.svg')
@@ -1644,7 +1644,7 @@ module ACMFacil
     # LETRA 3D — módulo PAUSADO (2026-07-12, pedido do Marcelo): botão oculto
     # da toolbar até retomarmos. Pra reativar, descomentar o bloco abaixo.
     # Estado da depuração: docs/SESSION_LOG.md (v1.8.78→v1.8.80).
-    # cmd_letra3d = UI::Command.new("ACMFacil — Letra 3D") { ACMFacil::Generator::Letra3d.ativar }
+    # cmd_letra3d = UI::Command.new("SignEng — Letra 3D") { ACMFacil::Generator::Letra3d.ativar }
     # cmd_letra3d.tooltip         = "Letra 3D — letras caixa pra impressão 3D a partir de SVG"
     # cmd_letra3d.status_bar_text = "Gera letras caixa pra impressão 3D (casca, suporte, fundo e acrílico)"
     # cmd_letra3d.small_icon      = File.join(ICONS_DIR, 'letra3d_24.svg')
@@ -1654,14 +1654,14 @@ module ACMFacil
     # DESENHO GEOMÉTRICO — Fase 1, OCULTO na release pública (2026-07-24,
     # pedido do Marcelo): sai da toolbar até o lançamento oficial.
     # Pra reativar (teste interno), descomentar o bloco abaixo.
-    # cmd_geoart = UI::Command.new("ACMFacil — Desenho Geométrico") { ACMFacil::Generator::GeoArt.ativar }
+    # cmd_geoart = UI::Command.new("SignEng — Desenho Geométrico") { ACMFacil::Generator::GeoArt.ativar }
     # cmd_geoart.tooltip         = "Desenho Geométrico — foto vira mosaico low-poly em ACM"
     # cmd_geoart.status_bar_text = "Transforma uma foto em quadro geométrico (mosaico de triângulos em ACM)"
     # cmd_geoart.small_icon      = File.join(ICONS_DIR, 'desenho_geometrico_24.svg')
     # cmd_geoart.large_icon      = File.join(ICONS_DIR, 'desenho_geometrico_32.svg')
     # toolbar.add_item(cmd_geoart)
 
-    cmd_movelparam = UI::Command.new("ACMFacil — Móvel Paramétrico") { ACMFacil::Generator::MovelParametrico.ativar }
+    cmd_movelparam = UI::Command.new("SignEng — Móvel Paramétrico") { ACMFacil::Generator::MovelParametrico.ativar }
     cmd_movelparam.tooltip         = "Móvel Paramétrico — fatia um sólido em chapas paralelas com fixação"
     cmd_movelparam.status_bar_text = "Gera móvel/painel paramétrico fatiado a partir de um sólido selecionado"
     cmd_movelparam.small_icon      = File.join(ICONS_DIR, 'movel_parametrico_24.svg')

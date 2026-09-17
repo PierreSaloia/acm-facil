@@ -18,7 +18,7 @@ const GeoArtUI = {
       pontos: 'Densidade (triângulos)', removerFundo: 'Remover fundo (cor dos cantos)',
       tol: 'Tolerância do fundo', largura: 'Largura final (mm)', espessura: 'Espessura ACM (mm)',
       folga: 'Junta entre peças (mm)',
-      msgProcessando: 'Processando no servidor ACMFacil…',
+      msgProcessando: 'Processando no servidor SignEng…',
       msgPronto: '✓ {n} triângulos — ajuste e clique Gerar.',
       msgGerado: '✓ Mosaico gerado com {n} peças!',
       msgGerando: 'Gerando o mosaico no SketchUp…',
@@ -43,7 +43,7 @@ const GeoArtUI = {
       pontos: 'Densidad (triángulos)', removerFundo: 'Quitar fondo (color de las esquinas)',
       tol: 'Tolerancia del fondo', largura: 'Ancho final (mm)', espessura: 'Espesor ACM (mm)',
       folga: 'Junta entre piezas (mm)',
-      msgProcessando: 'Procesando en el servidor ACMFacil…',
+      msgProcessando: 'Procesando en el servidor SignEng…',
       msgPronto: '✓ {n} triángulos — ajusta y pulsa Generar.',
       msgGerado: '✓ ¡Mosaico generado con {n} piezas!',
       msgGerando: 'Generando el mosaico en SketchUp…',
@@ -68,7 +68,7 @@ const GeoArtUI = {
       pontos: 'Density (triangles)', removerFundo: 'Remove background (corner color)',
       tol: 'Background tolerance', largura: 'Final width (mm)', espessura: 'ACM thickness (mm)',
       folga: 'Gap between pieces (mm)',
-      msgProcessando: 'Processing on the ACMFacil server…',
+      msgProcessando: 'Processing on the SignEng server…',
       msgPronto: '✓ {n} triangles — tweak and click Generate.',
       msgGerado: '✓ Mosaic generated with {n} pieces!',
       msgGerando: 'Generating the mosaic in SketchUp…',
@@ -222,7 +222,7 @@ const GeoArtUI = {
       if (r && r.ok) {
         GeoArtUI.setMsg(GeoArtUI.t('msgGerado').replace('{n}', r.n), 'ok');
       } else if (r && r.blocked) {
-        GeoArtUI.setMsg((r.error || 'Licença inválida. Faça login no painel do ACMFacil.') + (r.code ? ' [' + r.code + ']' : ''), 'error');
+        GeoArtUI.setMsg((r.error || 'Licença inválida. Faça login no painel do SignEng.') + (r.code ? ' [' + r.code + ']' : ''), 'error');
       } else {
         GeoArtUI.setMsg((r && r.error) || GeoArtUI.t((r && r.code) || 'geoart.exception'), 'error');
       }
@@ -329,7 +329,7 @@ const GeoArtUI = {
       if (r && r.ok) {
         GeoArtUI.setMsg(GeoArtUI.t('msg3dGerado').replace('{n}', r.n), 'ok');
       } else if (r && r.blocked) {
-        GeoArtUI.setMsg((r.error || 'Licença inválida. Faça login no painel do ACMFacil.') + (r.code ? ' [' + r.code + ']' : ''), 'error');
+        GeoArtUI.setMsg((r.error || 'Licença inválida. Faça login no painel do SignEng.') + (r.code ? ' [' + r.code + ']' : ''), 'error');
       } else {
         GeoArtUI.setMsg((r && r.error) || GeoArtUI.t((r && r.code) || 'geoart.exception'), 'error');
       }

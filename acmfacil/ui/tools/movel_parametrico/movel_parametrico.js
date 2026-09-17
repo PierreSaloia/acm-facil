@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Móvel Paramétrico (diálogo da ferramenta)
+   SignEng — Móvel Paramétrico (diálogo da ferramenta)
    ══════════════════════════════════════════════════════════════════════════
    Fluxo: selecionar o bloco sólido no modelo → configurar fatiamento e
    fixação → Gerar (componente com fatias etiquetadas + fixadores).
@@ -45,8 +45,8 @@ const MovelParamUI = {
       msgSemFatias: 'Nenhuma fatia coube no bloco — reduza a espessura ou o vão.',
       msgSrcSumiu: 'O bloco original deste móvel não existe mais no modelo.',
       msgCarregado: 'Parâmetros carregados — edite e clique Regenerar.',
-      msgNadaCarregar: 'Selecione um Móvel Paramétrico gerado pelo ACMFacil primeiro.',
-      msgBlocked: 'Licença inválida. Faça login no painel do ACMFacil.',
+      msgNadaCarregar: 'Selecione um Móvel Paramétrico gerado pelo SignEng primeiro.',
+      msgBlocked: 'Licença inválida. Faça login no painel do SignEng.',
       msgMuitasFatias: 'O fatiamento precisaria de {n} fatias (máximo {max}). Aumente o vão ou a espessura da chapa, ou fatie o conjunto em partes.',
       msgError: 'Erro: '
     },
@@ -78,8 +78,8 @@ const MovelParamUI = {
       msgSemFatias: 'Ninguna placa cupo en el bloque — reduce el espesor o el espacio.',
       msgSrcSumiu: 'El bloque original de este mueble ya no existe en el modelo.',
       msgCarregado: 'Parámetros cargados — edita y pulsa Regenerar.',
-      msgNadaCarregar: 'Selecciona primero un Mueble Paramétrico generado por ACMFacil.',
-      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de ACMFacil.',
+      msgNadaCarregar: 'Selecciona primero un Mueble Paramétrico generado por SignEng.',
+      msgBlocked: 'Licencia inválida. Inicia sesión en el panel de SignEng.',
       msgMuitasFatias: 'El rebanado necesitaría {n} placas (máximo {max}). Aumenta el espacio o el espesor de la placa, o rebana el conjunto por partes.',
       msgError: 'Error: '
     },
@@ -111,8 +111,8 @@ const MovelParamUI = {
       msgSemFatias: 'No slice fits the block — reduce thickness or gap.',
       msgSrcSumiu: 'The original block of this furniture no longer exists in the model.',
       msgCarregado: 'Parameters loaded — edit and click Regenerate.',
-      msgNadaCarregar: 'Select an ACMFacil-generated Parametric Furniture first.',
-      msgBlocked: 'Invalid license. Log in on the ACMFacil panel.',
+      msgNadaCarregar: 'Select an SignEng-generated Parametric Furniture first.',
+      msgBlocked: 'Invalid license. Log in on the SignEng panel.',
       msgMuitasFatias: 'Slicing would need {n} slices (maximum {max}). Increase the gap or sheet thickness, or slice the set in parts.',
       msgError: 'Error: '
     }

@@ -2,7 +2,7 @@ require 'sketchup.rb'
 require 'extensions.rb'
 
 # ═════════════════════════════════════════════════════════════════════════
-# ACMFacil — Plugin SketchUp para geração de fachadas em ACM
+# SignEng — Plugin SketchUp para geração de fachadas em ACM
 # ═════════════════════════════════════════════════════════════════════════
 # Este arquivo é o ponto de entrada descoberto pelo SketchUp.
 # Registra a extensão e carrega o main.rb sob demanda.
@@ -11,7 +11,7 @@ require 'extensions.rb'
 module ACMFacil
   unless file_loaded?(__FILE__)
     ext = SketchupExtension.new(
-      "ACMFacil",
+      "SignEng",
       File.join(File.dirname(__FILE__), "acmfacil", "main")
     )
     ext.version     = "1.9.32"

@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ============================================================================
-# ACMFacil — Modulo AUTO-ACM CURVO (v2)
+# SignEng — Modulo AUTO-ACM CURVO (v2)
 # Para colunas/elementos com:
 #   - 1 topo + 1 base
 #   - 1 lateral esquerda reta + 1 lateral direita reta (trapezios simples)
@@ -110,7 +110,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, pecas: [] }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         mmv = lambda { |v| (v / 1.mm).round(4) }
         pt  = lambda { |q| [mmv.call(q.x), mmv.call(q.y), mmv.call(q.z)] }
@@ -150,15 +150,15 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end
 
         result = r[:result] || {}
         pecas  = result["pecas"]
-        return { ok: false, error: "Resposta inválida do servidor ACMFacil." } unless pecas.is_a?(Array)
+        return { ok: false, error: "Resposta inválida do servidor SignEng." } unless pecas.is_a?(Array)
         { ok: true, pecas: pecas }
       end
 

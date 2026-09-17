@@ -467,7 +467,7 @@ window.CorteEncaixe = {
         Toast.error((r && r.error) || 'Erro ao calcular o plano de corte.');
       }
     } catch (e) {
-      if (window.Toast) Toast.error('Sem conexão com o servidor ACMFacil: ' + (e && e.message ? e.message : e));
+      if (window.Toast) Toast.error('Sem conexão com o servidor SignEng: ' + (e && e.message ? e.message : e));
     }
   },
 
@@ -1070,7 +1070,7 @@ window.CorteEncaixe = {
     }
     const totalW = CW, totalH = sheetsH + legendH;
     let svg = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    svg += '<!-- ACMFacil Corte & Encaixe — ' + s.modo + (s.modo === 'laser' ? (' kerf ' + s.kerf) : (' fresa ' + s.fresa)) +
+    svg += '<!-- SignEng Corte & Encaixe — ' + s.modo + (s.modo === 'laser' ? (' kerf ' + s.kerf) : (' fresa ' + s.fresa)) +
            'mm, dente ' + s.dente + 'mm, folga ' + s.folga + 'mm, chapa ' + CW + 'x' + CH + 'mm, ' + L.sheets.length + ' chapa(s) -->\n';
     svg += '<svg xmlns="http://www.w3.org/2000/svg" width="' + fm(totalW) + 'mm" height="' + fm(totalH) +
            'mm" viewBox="0 0 ' + fm(totalW) + ' ' + fm(totalH) + '">\n';

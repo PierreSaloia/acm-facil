@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — i18n (internacionalização)
+   SignEng — i18n (internacionalização)
    ══════════════════════════════════════════════════════════════════════════
    3 idiomas: pt (português), es (español), en (english).
    Uso:
@@ -84,7 +84,7 @@ const I18n = {
       "license.days_left":       "{n}d",
 
       "lic.expired.title":       "Seu período de teste expirou",
-      "lic.expired.msg":         "Renove pra continuar usando o ACMFacil. Assinatura Pro a partir de R$ 49/mês.",
+      "lic.expired.msg":         "Renove pra continuar usando o SignEng. Assinatura Pro a partir de R$ 49/mês.",
       "lic.expired.cta":         "Renovar agora",
       "lic.ending.title":        "Seu trial acaba em {n} dia(s)",
       "lic.ending.msg":          "Aproveita pra assinar agora e não perder o acesso.",
@@ -266,7 +266,7 @@ const I18n = {
       "plf.biblio.puxador":      "Puxador",
       "plf.biblio.gerar":        "Gerar / Regenerar móvel",
       "plf.biblio.planificar":   "Planificar agora",
-      "plf.biblio.blocked":      "Licença inválida. Faça login no painel do ACMFacil.",
+      "plf.biblio.blocked":      "Licença inválida. Faça login no painel do SignEng.",
       "plf.biblio.erro":         "Não foi possível gerar o móvel.",
       "plf.biblio.sugestao":     "SUGESTÃO ECONÔMICA:",
       "plf.biblio.aplicar":      "Aplicar",
@@ -347,7 +347,7 @@ const I18n = {
       "plf.plano.filename.msg":  "Confirme ou edite o nome do plano (letras, números, _ e -):",
       "plf.plano.doc.title":     "Plano de Corte",
       "plf.plano.doc.subtitle":  "Guia de corte e montagem",
-      "plf.plano.doc.gen":       "Gerado pelo ACMFacil · Planifica",
+      "plf.plano.doc.gen":       "Gerado pelo SignEng · Planifica",
       "plf.plano.doc.date":      "Data",
       "plf.plano.doc.equip":     "Equipamento",
       "plf.plano.doc.algo":      "Algoritmo",
@@ -492,7 +492,7 @@ const I18n = {
       /* ── AUTO-ACM ── */
       "aa.kicker":               "MODO REVERSO",
       "aa.title":                "Gerador Auto-ACM",
-      "aa.subtitle":             "Crie a caixa, selecione e capture. O ACMFacil preenche com toda a estrutura em ACM.",
+      "aa.subtitle":             "Crie a caixa, selecione e capture. O SignEng preenche com toda a estrutura em ACM.",
       "aa.step1.title":          "Crie e agrupe",
       "aa.step1.desc":           "Desenhe uma caixa no SketchUp e agrupe com a tecla G.",
       "aa.step2.title":          "Capture as faces",
@@ -939,7 +939,7 @@ const I18n = {
       "license.days_left":       "{n}d",
 
       "lic.expired.title":       "Tu período de prueba ha expirado",
-      "lic.expired.msg":         "Renueva para seguir usando ACMFacil. Suscripción Pro desde R$ 49/mes.",
+      "lic.expired.msg":         "Renueva para seguir usando SignEng. Suscripción Pro desde R$ 49/mes.",
       "lic.expired.cta":         "Renovar ahora",
       "lic.ending.title":        "Tu trial termina en {n} día(s)",
       "lic.ending.msg":          "Aprovecha y suscríbete antes para no perder el acceso.",
@@ -1120,7 +1120,7 @@ const I18n = {
       "plf.biblio.puxador":      "Tirador",
       "plf.biblio.gerar":        "Generar / Regenerar mueble",
       "plf.biblio.planificar":   "Aplanar ahora",
-      "plf.biblio.blocked":      "Licencia inválida. Inicia sesión en el panel de ACMFacil.",
+      "plf.biblio.blocked":      "Licencia inválida. Inicia sesión en el panel de SignEng.",
       "plf.biblio.erro":         "No fue posible generar el mueble.",
       "plf.biblio.sugestao":     "SUGERENCIA ECONÓMICA:",
       "plf.biblio.aplicar":      "Aplicar",
@@ -1201,7 +1201,7 @@ const I18n = {
       "plf.plano.filename.msg":  "Confirma o edita el nombre del plan (letras, números, _ y -):",
       "plf.plano.doc.title":     "Plan de Corte",
       "plf.plano.doc.subtitle":  "Guía de corte y montaje",
-      "plf.plano.doc.gen":       "Generado por ACMFacil · Planifica",
+      "plf.plano.doc.gen":       "Generado por SignEng · Planifica",
       "plf.plano.doc.date":      "Fecha",
       "plf.plano.doc.equip":     "Equipo",
       "plf.plano.doc.algo":      "Algoritmo",
@@ -1344,7 +1344,7 @@ const I18n = {
 
       "aa.kicker":               "MODO INVERSO",
       "aa.title":                "Generador Auto-ACM",
-      "aa.subtitle":             "Crea la caja, selecciona y captura. ACMFacil rellena con toda la estructura en ACM.",
+      "aa.subtitle":             "Crea la caja, selecciona y captura. SignEng rellena con toda la estructura en ACM.",
       "aa.step1.title":          "Crea y agrupa",
       "aa.step1.desc":           "Dibuja una caja en SketchUp y agrupa con la tecla G.",
       "aa.step2.title":          "Captura las caras",
@@ -1780,7 +1780,7 @@ const I18n = {
       "license.days_left":       "{n}d",
 
       "lic.expired.title":       "Your trial has expired",
-      "lic.expired.msg":         "Renew to keep using ACMFacil. Pro subscription from R$ 49/month.",
+      "lic.expired.msg":         "Renew to keep using SignEng. Pro subscription from R$ 49/month.",
       "lic.expired.cta":         "Renew now",
       "lic.ending.title":        "Your trial ends in {n} day(s)",
       "lic.ending.msg":          "Subscribe now so you don\u2019t lose access.",
@@ -1961,7 +1961,7 @@ const I18n = {
       "plf.biblio.puxador":      "Handle",
       "plf.biblio.gerar":        "Generate / Regenerate furniture",
       "plf.biblio.planificar":   "Flatten now",
-      "plf.biblio.blocked":      "Invalid license. Sign in on the ACMFacil panel.",
+      "plf.biblio.blocked":      "Invalid license. Sign in on the SignEng panel.",
       "plf.biblio.erro":         "Could not generate the furniture.",
       "plf.biblio.sugestao":     "ECONOMY SUGGESTION:",
       "plf.biblio.aplicar":      "Apply",
@@ -2042,7 +2042,7 @@ const I18n = {
       "plf.plano.filename.msg":  "Confirm or edit the plan name (letters, numbers, _ and -):",
       "plf.plano.doc.title":     "Cut Plan",
       "plf.plano.doc.subtitle":  "Cutting and assembly guide",
-      "plf.plano.doc.gen":       "Generated by ACMFacil · Planifica",
+      "plf.plano.doc.gen":       "Generated by SignEng · Planifica",
       "plf.plano.doc.date":      "Date",
       "plf.plano.doc.equip":     "Equipment",
       "plf.plano.doc.algo":      "Algorithm",
@@ -2185,7 +2185,7 @@ const I18n = {
 
       "aa.kicker":               "REVERSE MODE",
       "aa.title":                "Auto-ACM Generator",
-      "aa.subtitle":             "Create the box, select it and capture. ACMFacil fills it with the full ACM structure.",
+      "aa.subtitle":             "Create the box, select it and capture. SignEng fills it with the full ACM structure.",
       "aa.step1.title":          "Create and group",
       "aa.step1.desc":           "Draw a box in SketchUp and group it with the G key.",
       "aa.step2.title":          "Capture the faces",

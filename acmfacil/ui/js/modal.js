@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Modal customizado (substitui alert/confirm/prompt nativos)
+   SignEng — Modal customizado (substitui alert/confirm/prompt nativos)
    ══════════════════════════════════════════════════════════════════════════
    Uso:
      await Modal.alert('Estrutura gerada com sucesso.');

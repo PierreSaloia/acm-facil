@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Dashboard (lançador de módulos)
+   SignEng — Dashboard (lançador de módulos)
    ══════════════════════════════════════════════════════════════════════════ */
 
 const Dashboard = {
@@ -153,7 +153,7 @@ const Dashboard = {
           <div class="lic-banner__body">
             <div class="lic-banner__title">${I18n.t('lic.expired.title', 'Seu período de teste expirou')}</div>
             <div class="lic-banner__msg">${I18n.t('lic.expired.msg',
-              'Renove pra continuar usando o ACMFacil. Assinatura Pro a partir de R$ 49/mês.')}</div>
+              'Renove pra continuar usando o SignEng. Assinatura Pro a partir de R$ 49/mês.')}</div>
           </div>
           <button type="button" class="btn btn--primary" onclick="Dashboard.openUpgrade()">
             ${I18n.t('lic.expired.cta', 'Renovar agora')}
@@ -208,7 +208,7 @@ const Dashboard = {
       : I18n.t('lic.needed.title', 'Licença necessária');
     const msg = expired
       ? I18n.t('lic.expired.msg',
-          'Renove pra continuar usando o ACMFacil. Assinatura Pro a partir de R$ 49/mês.')
+          'Renove pra continuar usando o SignEng. Assinatura Pro a partir de R$ 49/mês.')
       : I18n.t('lic.needed.msg',
           'Esse módulo requer uma licença ativa. Ative seu trial ou assine pra começar.');
 

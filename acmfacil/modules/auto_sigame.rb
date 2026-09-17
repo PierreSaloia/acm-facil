@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ============================================================================
-# ACMFacil — Modulo AUTO SIGAM-ME (Auto-ACM + Follow-Me)
+# SignEng — Modulo AUTO SIGAM-ME (Auto-ACM + Follow-Me)
 #
 # Gera uma FAIXA CONTÍNUA de ACM que segue uma polilinha desenhada na fachada.
 # O usuario define altura + profundidade + as configs do ACM no painel, clica
@@ -259,7 +259,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, pecas: pecas_locais_sigame(pts, alt_mm, prof_mm, params) }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         payload = {
           "pts"     => pts.map { |p| [p.x / 1.mm, p.y / 1.mm, p.z / 1.mm] },
@@ -284,8 +284,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

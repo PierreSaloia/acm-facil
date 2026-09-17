@@ -237,7 +237,7 @@ module ACMFacil
     # ========================================================================
     # ACM_SKM_DIRS — pastas onde procurar os .skm reais da paleta VISUALMAXX
     #
-    # O ACMFacil tem PLUGIN_DIR fora da hierarquia do SketchUp (fica no
+    # O SignEng tem PLUGIN_DIR fora da hierarquia do SketchUp (fica no
     # diretorio do projeto), entao ../../ NAO cai em Materials/ACM como
     # caia no plugin legado. Procuramos em multiplos lugares:
     #
@@ -287,7 +287,7 @@ module ACMFacil
 
       # Filtra so as pastas que existem
       result = dirs.uniq.select { |d| File.directory?(d) }
-      puts "[ACMFacil] acm_skm_dirs encontradas: #{result.inspect}" if result.empty?
+      puts "[SignEng] acm_skm_dirs encontradas: #{result.inspect}" if result.empty?
       result
     end
 

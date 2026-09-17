@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ============================================================================
-# ACMFacil — Módulo TEXTURA SINCRONIZADA
+# SignEng — Módulo TEXTURA SINCRONIZADA
 # ============================================================================
 # Aplica uma única textura "atravessando" várias faces de forma contínua,
 # como se as faces fossem janelas mostrando uma única imagem por trás.
@@ -284,7 +284,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, result: {} }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         r = Core::FirebaseClient.call_function("texturaSyncCompute", payload, id_token)
         if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
@@ -302,8 +302,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

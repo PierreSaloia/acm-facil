@@ -745,7 +745,7 @@ window.AutoSigame = {
           ${resumo}
           ${assinatura}
           <div class="capa-footer">
-            <span>ACMFacil · Plano de Corte</span>
+            <span>SignEng · Plano de Corte</span>
             <span>${dt}</span>
           </div>
         </div>

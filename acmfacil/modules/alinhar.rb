@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Alinhar (ferramenta de toolbar)
+# SignEng — Alinhar (ferramenta de toolbar)
 # ═══════════════════════════════════════════════════════════════════════════
 # Alinha o objeto 2 (móvel) ao objeto 1 (fixo) no REFERENCIAL do objeto 1:
 # frame derivado da maior face dele (ya = face/fundo, za = cima, xa = esq/dir),
@@ -41,7 +41,7 @@ module ACMFacil
         end
 
         @dialog = UI::HtmlDialog.new(
-          dialog_title:    "ACMFacil — Alinhar",
+          dialog_title:    "SignEng — Alinhar",
           preferences_key: "com.acmfacil.alinhar",
           width:           380,
           height:          680,
@@ -191,7 +191,7 @@ module ACMFacil
         )
 
         model = Sketchup.active_model
-        model.start_operation("Alinhar ACMFacil", true)
+        model.start_operation("Alinhar SignEng", true)
         @movel.transform!(Geom::Transformation.translation(vec))
         model.commit_operation
 
@@ -246,7 +246,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, xa: [1.0, 0.0, 0.0], ya: [0.0, 1.0, 0.0], za: [0.0, 0.0, 1.0] }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         payload = {
           "normal" => normal ? [normal.x, normal.y, normal.z] : nil,
@@ -269,8 +269,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

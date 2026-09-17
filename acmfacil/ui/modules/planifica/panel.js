@@ -1846,7 +1846,7 @@ ${capa}
       <div class="capa__title"><span class="capa-kicker">${t('plf.plano.doc.capa_kicker')}</span><h2>${t('plf.plano.doc.title')}</h2><p class="capa-sub">${t('plf.plano.doc.gen_on', { date: ctx.dateStr })}</p></div>
       ${resumo}
       ${assinatura}
-      <div class="capa-footer"><span>ACMFacil · Planifica</span><span>${Planifica._esc(ctx.dateStr)}</span></div>
+      <div class="capa-footer"><span>SignEng · Planifica</span><span>${Planifica._esc(ctx.dateStr)}</span></div>
     </div></div>`;
   },
 

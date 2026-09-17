@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Router (navegação entre views + carregamento dinâmico)
+   SignEng — Router (navegação entre views + carregamento dinâmico)
    ══════════════════════════════════════════════════════════════════════════ */
 
 const Router = {

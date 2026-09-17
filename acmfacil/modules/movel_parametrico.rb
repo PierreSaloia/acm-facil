@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Móvel Paramétrico (ferramenta de toolbar)
+# SignEng — Móvel Paramétrico (ferramenta de toolbar)
 # ═══════════════════════════════════════════════════════════════════════════
 # Fatia um SÓLIDO modelado pelo usuário (grupo/componente fechado) em fatias
 # paralelas de chapa (MDF/compensado) — o estilo "móvel paramétrico" de CNC:
@@ -36,7 +36,7 @@ module ACMFacil
           return
         end
         @dialog = UI::HtmlDialog.new(
-          dialog_title:    "ACMFacil — Móvel Paramétrico",
+          dialog_title:    "SignEng — Móvel Paramétrico",
           preferences_key: "com.acmfacil.movel_parametrico",
           width:           440,
           height:          760,
@@ -169,7 +169,7 @@ module ACMFacil
           return { ok: false, code: "mp.nada_selecionado" } if candidatos.empty?
         end
 
-        model.start_operation("Gerar Móvel Paramétrico ACMFacil", true)
+        model.start_operation("Gerar Móvel Paramétrico SignEng", true)
         novo = inst.nil?
 
         # Prepara as peças: REPARO AUTOMÁTICO do que não for sólido (arestas
@@ -214,7 +214,7 @@ module ACMFacil
         end
 
         if novo
-          defn = model.definitions.add("ACMFacil Móvel Paramétrico")
+          defn = model.definitions.add("SignEng Móvel Paramétrico")
         else
           defn = inst.definition
           defn.entities.clear!
@@ -449,8 +449,8 @@ module ACMFacil
           else                        (lmin + lmax) / 2.0
           end
 
-        mat_metal   = material_rgb("ACMFacil Metal", [120, 120, 125])
-        mat_madeira = material_rgb("ACMFacil Madeira", [176, 138, 90])
+        mat_metal   = material_rgb("SignEng Metal", [120, 120, 125])
+        mat_madeira = material_rgb("SignEng Madeira", [176, 138, 90])
 
         if tipo == 'ripa'
           qtd  = p[:fix_qtd]
@@ -527,7 +527,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, result: {} }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         r = Core::FirebaseClient.call_function("movelParametricoCompute", payload, id_token)
         if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
@@ -545,8 +545,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

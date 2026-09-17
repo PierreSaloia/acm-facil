@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════════════════════════════════
-   ACMFacil — Toast notifications
+   SignEng — Toast notifications
    ══════════════════════════════════════════════════════════════════════════
    Uso:
      Toast.success('Estrutura gerada');

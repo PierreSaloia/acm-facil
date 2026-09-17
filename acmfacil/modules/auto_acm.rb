@@ -65,7 +65,7 @@ module ACMFacil
       # ======================================================================
       # ======================================================================
       # CAPTURAR FACES — versao BRIDGE (retorna hash em vez de execute_script)
-      # Usada pelo novo plugin ACMFacil. Retorna:
+      # Usada pelo novo plugin SignEng. Retorna:
       #   { ok: true, modulos: [...], face_colors: [...] }
       #   { ok: false, code: "autoacm.no_selection" }
       # ======================================================================
@@ -288,7 +288,7 @@ module ACMFacil
 
       # ══════════════════════════════════════════════════════════════════════
       # (LEGADO) pintar_faces com execute_script — preservado pra nao quebrar
-      # nada que ainda dependa dele. Nao e usado pelo novo plugin ACMFacil.
+      # nada que ainda dependa dele. Nao e usado pelo novo plugin SignEng.
       # ══════════════════════════════════════════════════════════════════════
       def self.pintar_faces(dialog)
         model = Sketchup.active_model
@@ -1345,7 +1345,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, pecas: pecas_locais(params, w_mm, d_mm, h_mm) }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         payload = { params: params, w: w_mm, d: d_mm, h: h_mm, recortes: rec_mm }
         r = Core::FirebaseClient.call_function("autoAcmCompute", payload, id_token)
@@ -1366,15 +1366,15 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end
 
         result = r[:result] || {}
         pecas  = result["pecas"]
-        return { ok: false, error: "Resposta inválida do servidor ACMFacil." } unless pecas.is_a?(Array)
+        return { ok: false, error: "Resposta inválida do servidor SignEng." } unless pecas.is_a?(Array)
         { ok: true, pecas: pecas }
       end
 

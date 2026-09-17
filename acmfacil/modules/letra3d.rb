@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Letra 3D (ferramenta de toolbar)
+# SignEng — Letra 3D (ferramenta de toolbar)
 # ═══════════════════════════════════════════════════════════════════════════
 # Letras caixa pra IMPRESSÃO 3D a partir de um SVG importado. Pra cada letra
 # (subpath fechado, com furos) gera 4 camadas paramétricas, deitadas (Z =
@@ -51,7 +51,7 @@ module ACMFacil
           return
         end
         @dialog = UI::HtmlDialog.new(
-          dialog_title:    "ACMFacil — Letra 3D",
+          dialog_title:    "SignEng — Letra 3D",
           preferences_key: "com.acmfacil.letra3d",
           width:           430,
           height:          720,
@@ -206,7 +206,7 @@ module ACMFacil
           inst = ent if ent && ent.valid? && ent.is_a?(Sketchup::ComponentInstance)
         end
 
-        model.start_operation("Gerar Letra 3D ACMFacil", true)
+        model.start_operation("Gerar Letra 3D SignEng", true)
         novo = inst.nil?
 
         # 1. Constrói as faces do SVG num grupo temporário (furos resolvidos)
@@ -238,7 +238,7 @@ module ACMFacil
         end
 
         if novo
-          defn = model.definitions.add("ACMFacil Letra3D")
+          defn = model.definitions.add("SignEng Letra3D")
         else
           defn = inst.definition
           defn.entities.clear!
@@ -284,7 +284,7 @@ module ACMFacil
         fg_f  = mm2in(p[:folga_fundo])
 
         mat_letra = acm_material(p[:cor_nome], p[:cor_rgb])
-        mat_fundo = material_rgb("ACMFacil Fundo", [120, 120, 120])
+        mat_fundo = material_rgb("SignEng Fundo", [120, 120, 120])
         mat_acr   = p[:acr_tipo] == 'cristal' ?
                     material_rgb("Acrílico cristal", [225, 232, 238], 0.35) :
                     material_rgb("Acrílico leitoso", [246, 246, 244], 0.75)

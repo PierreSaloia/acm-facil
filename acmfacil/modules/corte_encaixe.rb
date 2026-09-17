@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════════════════
-# ACMFacil — Corte & Encaixe
+# SignEng — Corte & Encaixe
 # ═══════════════════════════════════════════════════════════════════════════
 # Captura um objeto montado (caixa/móvel de chapas), planifica as peças em 2D,
 # gera ENCAIXES finger-joint nas bordas onde as peças se encontram e exporta
@@ -339,7 +339,7 @@ module ACMFacil
         if Core::Auth::OFFLINE_MODE
           return { ok: true, joints: [], oversized: [], layout: data["layout"] || [] }
         end
-        return { ok: false, error: "Sessão expirada — faça login novamente no ACMFacil." } if id_token.empty?
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
 
         payload = {
           "solid"    => data["solid"] == true,
@@ -364,8 +364,8 @@ module ACMFacil
         unless r[:ok]
           msg = case r[:code].to_s
                 when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no ACMFacil."
-                else "Sem conexão com o servidor ACMFacil (#{r[:error]}). Verifique sua internet e tente novamente."
+                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
+                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end
@@ -416,11 +416,11 @@ module ACMFacil
       # temporário, um grupo travado, igual à fita de borda do Planifica).
       # pecas = [ { "rgb" => [r,g,b], "poly" => [[x,y,z] mm mundo, ...] } ]
       # ──────────────────────────────────────────────────────────────────────
-      PECAS_GROUP = "ACMFacil — Corte & Encaixe (cores)".freeze
+      PECAS_GROUP = "SignEng — Corte & Encaixe (cores)".freeze
 
       def self.marcar_pecas(pecas)
         model = Sketchup.active_model
-        model.start_operation("ACMFacil — cores das peças", true)
+        model.start_operation("SignEng — cores das peças", true)
         apagar_grupos_pecas(model)
         if pecas.nil? || pecas.empty?
           model.commit_operation
@@ -452,7 +452,7 @@ module ACMFacil
 
       def self.limpar_pecas
         model = Sketchup.active_model
-        model.start_operation("ACMFacil — limpar cores", true)
+        model.start_operation("SignEng — limpar cores", true)
         k = apagar_grupos_pecas(model)
         model.commit_operation
         { ok: true, n: k }
@@ -466,7 +466,7 @@ module ACMFacil
 
       def self.peca_material(model, rgb)
         r = rgb[0].to_i; g = rgb[1].to_i; b = rgb[2].to_i
-        nome = "ACMFacil_CEJ_#{r}_#{g}_#{b}"
+        nome = "SignEng_CEJ_#{r}_#{g}_#{b}"
         m = model.materials[nome] || model.materials.add(nome)
         m.color = Sketchup::Color.new(r, g, b)
         m.alpha = 0.85
