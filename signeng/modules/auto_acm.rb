@@ -1386,8 +1386,6 @@ module SignEng
         enabled = dir_enabled_map(p)
         mw = (params[:mw] || params["mw"] || 20).to_f
         mh = (params[:mh] || params["mh"] || 20).to_f
-        ew = (params[:ew] || params["ew"] || 30).to_f
-        eh = (params[:eh] || params["eh"] || 20).to_f
         pieces = []
         add_box = lambda do |group, x, y, z, dx, dy, dz, mat, name|
           return if [dx, dy, dz].any? { |v| v.to_f <= 0.1 }
@@ -1395,34 +1393,53 @@ module SignEng
                       "dx" => dx, "dy" => dy, "dz" => dz, "mat" => mat, "nome" => name }
         end
 
-        # Molduras por face habilitada. Cada face recebe quatro perfis; faces
-        # opostas compartilham a mesma caixa e não dependem da nuvem.
-        faces = {
-          "frontal" => ["ny", 0, 0, 0, w_mm, mw, h_mm],
-          "traseira" => ["py", 0, d_mm - mw, 0, w_mm, mw, h_mm],
-          "esq" => ["nx", 0, 0, 0, mw, d_mm, h_mm],
-          "dir" => ["px", w_mm - mw, 0, 0, mw, d_mm, h_mm],
-          "topo" => ["pz", 0, 0, h_mm - mh, w_mm, d_mm, mh],
-          "base" => ["nz", 0, 0, 0, w_mm, d_mm, mh]
-        }
-        faces.each do |role, (dir, x, y, z, dx, dy, dz)|
-          next unless enabled[dir]
-          add_box.call("est", x, y, z, dx, dy, dz, "Metalon", "M.#{role}")
+        # Mesmo envelope da prévia 3D: 4 montantes nos cantos, 4 perfis no
+        # eixo X e 4 no eixo Y. Cada perfil fica na face correspondente; nunca
+        # usamos um bloco com d_mm x h_mm para representar uma parede inteira.
+        front = enabled[roles["frontal"]]
+        back  = enabled[roles["traseira"]]
+        left  = enabled[roles["esq"]]
+        right = enabled[roles["dir"]]
+        top   = enabled[roles["topo"]]
+        base  = enabled[roles["base"]]
+
+        if front || back
+          y_front = 0.0
+          y_back = [d_mm - mw, 0.0].max
+          [front ? [y_front, "F"] : nil, back ? [y_back, "T"] : nil].compact.each do |y, label|
+            add_box.call("est", 0, y, 0, w_mm, mw, mh, "Metalon", "M.X.B.#{label}") if base
+            add_box.call("est", 0, y, [h_mm - mh, 0.0].max, w_mm, mw, mh, "Metalon", "M.X.T.#{label}") if top
+            add_box.call("est", 0, y, 0, mw, mw, h_mm, "Metalon", "M.Z.L.#{label}")
+            add_box.call("est", [w_mm - mw, 0.0].max, y, 0, mw, mw, h_mm, "Metalon", "M.Z.R.#{label}")
+
+            count_x = [(w_mm / 600.0).floor, 0].max
+            (1..count_x).each do |i|
+              x = (w_mm * i / (count_x + 1.0)) - mw / 2.0
+              add_box.call("est", x, y, 0, mw, mw, h_mm, "Metalon", "M.Mt.X#{i}.#{label}")
+            end
+            count_z = [(h_mm / 600.0).floor, 0].max
+            (1..count_z).each do |i|
+              z = (h_mm * i / (count_z + 1.0)) - mh / 2.0
+              add_box.call("est", 0, y, z, w_mm, mw, mh, "Metalon", "M.Tv.Z#{i}.#{label}")
+            end
+          end
         end
 
-        # Travessas internas para evitar que o modo offline produza apenas uma
-        # moldura vazia em módulos largos ou altos.
-        if enabled[roles["frontal"]]
-          count_x = [(w_mm / 600.0).floor, 0].max
-          (1..count_x).each do |i|
-            x = (w_mm * i / (count_x + 1.0)) - mw / 2.0
-            add_box.call("est", x, 0, 0, mw, d_mm, h_mm, "Metalon", "M.Mt.X#{i}")
-          end
-          count_z = [(h_mm / 600.0).floor, 0].max
-          (1..count_z).each do |i|
-            z = (h_mm * i / (count_z + 1.0)) - mh / 2.0
-            add_box.call("est", 0, 0, z, w_mm, d_mm, mh, "Metalon", "M.Tv.Z#{i}")
-          end
+        # Perfis laterais ligam frente/trás somente quando a face lateral está
+        # habilitada. Isso reproduz as quatro arestas Y da prévia.
+        [[left, 0.0, "E"], [right, [w_mm - mw, 0.0].max, "D"]].each do |on, x, label|
+          next unless on
+          add_box.call("est", x, 0, 0, mw, d_mm, mh, "Metalon", "M.Y.B.#{label}") if base
+          add_box.call("est", x, 0, [h_mm - mh, 0.0].max, mw, d_mm, mh, "Metalon", "M.Y.T.#{label}") if top
+        end
+
+        # Se nenhuma face de fechamento foi habilitada, ainda mantém um
+        # perímetro mínimo visível, em vez de gerar uma caixa inconsistente.
+        if pieces.empty?
+          add_box.call("est", 0, 0, 0, w_mm, mw, mh, "Metalon", "M.X.B.Fallback")
+          add_box.call("est", 0, 0, [h_mm - mh, 0.0].max, w_mm, mw, mh, "Metalon", "M.X.T.Fallback")
+          add_box.call("est", 0, 0, 0, mw, mw, h_mm, "Metalon", "M.Z.L.Fallback")
+          add_box.call("est", [w_mm - mw, 0.0].max, 0, 0, mw, mw, h_mm, "Metalon", "M.Z.R.Fallback")
         end
 
         if p[:inc_fita]
