@@ -1,6 +1,15 @@
-<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <rect x="2"  y="2"  width="12" height="12" rx="2" fill="currentColor"/>
-  <rect x="16" y="2"  width="14" height="12" rx="2" fill="currentColor"/>
-  <rect x="2"  y="16" width="14" height="14" rx="2" fill="currentColor"/>
-  <rect x="18" y="18" width="12" height="12" rx="2" fill="currentColor" opacity="0.35"/>
+<svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="seLogoGrad" x1="4" y1="36" x2="36" y2="4" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"  stop-color="#0b1f3a"/>
+      <stop offset="50%" stop-color="#0e7490"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="seLogoAccent" x1="24" y1="14" x2="36" y2="2" gradientUnits="userSpaceOnUse">
+      <stop offset="0%"  stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#a5f3fc"/>
+    </linearGradient>
+  </defs>
+  <path d="M20,6 A7,7 0 0 1 20,20 A7,7 0 0 0 20,34" fill="none" stroke="url(#seLogoGrad)" stroke-width="8" stroke-linecap="round"/>
+  <polygon points="36,3 25,3 36,14" fill="url(#seLogoAccent)"/>
 </svg>
