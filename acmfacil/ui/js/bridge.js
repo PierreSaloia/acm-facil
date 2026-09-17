@@ -21,34 +21,21 @@ const Bridge = {
    * @returns {Promise<object>}
    */
   call(action, payload = {}, timeoutMs = 60000) {
-    return new Promise((resolve, reject) => {
-      // Gera um id único pra essa chamada
-      const id = 'b' + (++Bridge._lastId) + '_' + Date.now();
-      Bridge._callbacks[id] = { resolve, reject, timer: null };
-
-      // Timeout de segurança
-      Bridge._callbacks[id].timer = setTimeout(() => {
-        if (Bridge._callbacks[id]) {
-          delete Bridge._callbacks[id];
-          reject(new Error('Timeout: Ruby não respondeu em ' + Math.round(timeoutMs / 1000) + 's (' + action + ')'));
-        }
-      }, timeoutMs);
-
-      const full = Object.assign({ id }, payload);
-
-      // sketchup global existe só dentro do HtmlDialog do SketchUp
-      if (typeof sketchup === 'undefined' || !sketchup[action]) {
-        clearTimeout(Bridge._callbacks[id].timer);
-        delete Bridge._callbacks[id];
-        reject(new Error('Callback Ruby não registrado: ' + action));
-        return;
-      }
-
+    return new Promise(async (resolve, reject) => {
       try {
-        sketchup[action](JSON.stringify(full));
+        const res = await fetch(`/api/${action}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        
+        if (data && data.blocked === true && !(typeof Auth !== 'undefined' && Auth.state && Auth.state.user && Auth.state.user.local_id === 'offline-local-user') && typeof App !== 'undefined' && App.handleBlocked) {
+          try { App.handleBlocked(data); } catch (e) { console.warn('handleBlocked falhou:', e); }
+        }
+        
+        resolve(data);
       } catch (e) {
-        clearTimeout(Bridge._callbacks[id].timer);
-        delete Bridge._callbacks[id];
         reject(e);
       }
     });
