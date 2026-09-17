@@ -8,49 +8,80 @@ const Dashboard = {
   modules: [
     {
       id: 'auto_acm',
+      category: 'fachadas',
+      name: 'Auto-ACM | Estrutura de fachada',
+      desc: 'Transforma uma caixa selecionada em fachada ACM completa, com metalon, chapas, juntas e acabamento.',
       badge: { type: 'info', key: 'badge.main' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1" opacity="0.4"/></svg>`
     },
     {
       id: 'auto_acm_curvo',
+      category: 'fachadas',
+      name: 'Auto-ACM Curvo | Fachada facetada',
+      desc: 'Cria estruturas curvas e facetadas para colunas, marquises e fachadas com geometria não plana.',
       badge: { type: 'info', key: 'badge.new' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21 C5 8, 19 8, 19 21"/><line x1="5" y1="21" x2="19" y2="21"/><path d="M7 18 C7 11, 17 11, 17 18" opacity="0.5"/><path d="M9 15 C9 13, 15 13, 15 15" opacity="0.3"/></svg>`
     },
     {
       id: 'auto_sigame',
+      category: 'fachadas',
+      name: 'Auto Sigam-me | Faixa no caminho',
+      desc: 'Desenha uma faixa de ACM que acompanha um caminho 3D, incluindo pele, perfis e montantes.',
       badge: { type: 'info', key: 'badge.new' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 L8 18 L8 11 L14 11 L14 16 L21 16"/><circle cx="3" cy="18" r="1.4" fill="currentColor" stroke="none"/><circle cx="8" cy="11" r="1.4" fill="currentColor" stroke="none"/><circle cx="14" cy="16" r="1.4" fill="currentColor" stroke="none"/><circle cx="21" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>`
     },
     {
       id: 'textura_sync',
+      category: 'acabamento',
+      name: 'Textura Sincronizada | Material contínuo',
+      desc: 'Aplica uma única imagem alinhada através de várias faces, sem cortes visuais entre os painéis.',
       badge: { type: 'info', key: 'badge.new' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/><path d="M3 17l4-4 3 3" opacity="0.5"/></svg>`
     },
     {
       id: 'logo3d',
+      category: 'identidade',
+      name: 'Logo 3D | Relevo e extrusão',
+      desc: 'Importa DXF, DWG ou SVG e transforma a arte em logo 3D sólido, oco ou com placa de fundo.',
       badge: { type: 'info', key: 'badge.new' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7 L12 3 L21 7 L21 17 L12 21 L3 17 Z"/><path d="M3 7 L12 11 L21 7"/><path d="M12 11 L12 21" opacity="0.6"/><path d="M7 9 L7 15" opacity="0.4"/><path d="M17 9 L17 15" opacity="0.4"/></svg>`
     },
     {
       id: 'planifica',
+      category: 'fabricacao',
+      name: 'Planifica | Plano de corte',
+      desc: 'Desmonta painéis, organiza as peças em chapas e prepara um plano de corte para fabricação.',
       badge: { type: 'info', key: 'badge.new' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="1.5"/><rect x="5.5" y="5.5" width="7" height="5" rx="0.5" opacity="0.6"/><rect x="14" y="5.5" width="4.5" height="9" rx="0.5" opacity="0.6"/><rect x="5.5" y="12" width="7" height="6.5" rx="0.5" opacity="0.4"/></svg>`
     },
     {
       id: 'corte_encaixe',
+      category: 'fabricacao',
+      name: 'Corte & Encaixe | Juntas CNC',
+      desc: 'Gera dentes de encaixe entre peças e exporta o desenho vetorial para laser ou CNC.',
       badge: { type: 'info', key: 'badge.new' },
       locked: false,
       svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v3h4V4h6v6h-3v4h3v6h-6v-3h-4v3H4v-6h3v-4H4z"/><path d="M10 10h4v4h-4z" opacity="0.5"/></svg>`
-    }
-    // Cards "Em breve" (marquise, colunas, caixa_luminosa, letras_caixa,
-    // corte_cnc) REMOVIDOS do lançador a pedido do Marcelo (2026-07-22) —
-    // voltam quando cada módulo for lançado de verdade.
+    },
+    { id: 'alinhar', category: 'ferramentas', name: 'Alinhar | Posicionamento preciso', desc: 'Alinha grupos e componentes por borda, centro, face ou direção da câmera.', badge: { type: 'info', key: 'badge.new' }, locked: false, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16M4 12h16M4 20h16M8 2v4M16 10v4M8 18v4"/></svg>' },
+    { id: 'luminoso', category: 'identidade', name: 'Luminoso | Caixa de luz ACM', desc: 'Cria caixas luminosas paramétricas redondas, quadradas ou retangulares.', badge: { type: 'info', key: 'badge.new' }, locked: false, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>' },
+    { id: 'letra3d', category: 'identidade', name: 'Letra 3D | Letras caixa', desc: 'Converte letras vetoriais em componentes 3D com frente, fundo, laterais e acrílico.', badge: { type: 'info', key: 'badge.new' }, locked: false, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 20L10 4h4l5 16M7 14h10M3 20h4M17 20h4"/></svg>' },
+    { id: 'desenho_geometrico', category: 'identidade', name: 'Desenho Geométrico | Mosaico 3D', desc: 'Converte uma imagem em mosaico low-poly e cria um painel geométrico no SketchUp.', badge: { type: 'info', key: 'badge.new' }, locked: false, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 19L9 5l6 8 3-4 3 10H3z"/><path d="M9 5l6 8M15 13l6 6" opacity=".55"/></svg>' },
+    { id: 'movel_parametrico', category: 'fabricacao', name: 'Móvel Paramétrico | Fatiamento', desc: 'Fatia sólidos selecionados em painéis paralelos e adiciona fixadores para montagem.', badge: { type: 'info', key: 'badge.new' }, locked: false, svg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5h16v14H4zM8 5v14M16 5v14M4 10h16M4 15h16"/></svg>' }
+  ],
+
+  categories: [
+    ['fachadas', 'Fachadas e estruturas'],
+    ['acabamento', 'Materiais e acabamento'],
+    ['identidade', 'Identidade visual e iluminação'],
+    ['fabricacao', 'Fabricação e corte'],
+    ['ferramentas', 'Ferramentas de precisão']
   ],
 
   render() {
@@ -75,12 +106,12 @@ const Dashboard = {
     Dashboard._renderLicenseBanner(user, license, { licBlocks, daysLeft, isPrivileged });
 
     // ── Renderiza os cards ──
-    grid.innerHTML = Dashboard.modules.map(m => {
+    const query = (document.getElementById('dash_search')?.value || '').trim().toLowerCase();
+    const renderCard = m => {
       let hasAccess;
       if (isPrivileged) {
         hasAccess = true;
       } else if (licBlocks) {
-        // Licença expirada/inexistente → nada liberado
         hasAccess = false;
       } else if (allowed.length > 0) {
         hasAccess = allowed.indexOf(m.id) !== -1;
@@ -88,42 +119,36 @@ const Dashboard = {
         hasAccess = licActive;
       }
 
-      // Distinção visual:
-      //  - card--locked: módulo "coming soon" (permanent, mesmo pra admin)
-      //  - card--blocked: bloqueado pela licença (mostra modal de upgrade)
       const isLocked  = m.locked;
       const isBlocked = !isLocked && !hasAccess;
       const classes = ['card'];
-      if (isLocked)  classes.push('card--locked');
+      if (isLocked) classes.push('card--locked');
       if (isBlocked) classes.push('card--blocked');
-
       let onClick = '';
       if (isLocked) {
-        // Não faz nada
+        onClick = 'aria-disabled="true"';
       } else if (isBlocked) {
         onClick = `onclick="Dashboard.showUpgradePrompt('${m.id}')"`;
       } else {
         onClick = `onclick="Dashboard.open('${m.id}')"`;
       }
-
-      const name  = I18n.t('mod.' + m.id + '.name', m.id);
-      const desc  = I18n.t('mod.' + m.id + '.desc', '');
+      const name = m.name || I18n.t('mod.' + m.id + '.name', m.id);
+      const desc = m.desc || I18n.t('mod.' + m.id + '.desc', '');
       const badge = m.badge ? Dashboard._renderBadge(m.badge) : '';
-      const lockIcon = isBlocked
-        ? `<div class="card__lock-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>`
-        : '';
-
-      return `
-        <article class="${classes.join(' ')}" ${onClick}>
-          ${lockIcon}
-          <div class="card__visual">${m.svg}</div>
-          ${badge}
-          <h3 class="card__title">${name}</h3>
-          <p class="card__desc">${desc}</p>
-        </article>
-      `;
+      const lockIcon = isBlocked ? `<div class="card__lock-overlay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>` : '';
+      return `<article class="${classes.join(' ')}" ${onClick}>${lockIcon}<div class="card__visual">${m.svg}</div>${badge}<h3 class="card__title">${name}</h3><p class="card__desc">${desc}</p></article>`;
+    };
+    grid.innerHTML = Dashboard.categories.map(([id, title]) => {
+      const categoryCards = Dashboard.modules.filter(m => m.category === id).filter(m => {
+        const text = `${m.name || ''} ${m.desc || ''} ${m.id}`.toLowerCase();
+        return !query || text.includes(query);
+      });
+      if (!categoryCards.length) return '';
+      return `<section class="module-category" data-category="${id}"><div class="module-category__heading"><span class="module-category__eyebrow">SignEng / módulos</span><h3>${title}</h3><span class="module-category__count">${categoryCards.length}</span></div><div class="module-category__grid">${categoryCards.map(renderCard).join('')}</div></section>`;
     }).join('');
   },
+
+  filterModules() { Dashboard.render(); },
 
   _renderLicenseBanner(user, license, ctx) {
     const host = document.getElementById('dash_license_banner');
@@ -196,6 +221,11 @@ const Dashboard = {
   },
 
   open(moduleId) {
+    const tools = new Set(['alinhar', 'luminoso', 'letra3d', 'desenho_geometrico', 'movel_parametrico']);
+    if (tools.has(moduleId)) {
+      Bridge.call('tool_open', { tool: moduleId }).catch(() => {});
+      return;
+    }
     Router.goto('module', { moduleName: moduleId });
   },
 

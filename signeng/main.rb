@@ -411,6 +411,26 @@ module SignEng
       resolver(dlg, data["id"], { ok: true, module: mod })
     end
 
+    dlg.add_action_callback("tool_open") do |_ctx, json|
+      data = parse_payload(json)
+      tool = data["tool"].to_s
+      tools = {
+        "alinhar" => -> { SignEng::Generator::Alinhar.ativar },
+        "luminoso" => -> { SignEng::Generator::Luminoso.ativar },
+        "letra3d" => -> { SignEng::Generator::Letra3d.ativar },
+        "desenho_geometrico" => -> { SignEng::Generator::GeoArt.ativar },
+        "movel_parametrico" => -> { SignEng::Generator::MovelParametrico.ativar }
+      }
+      if tools[tool]
+        tools[tool].call
+        resolver(dlg, data["id"], { ok: true, tool: tool })
+      else
+        resolver(dlg, data["id"], { ok: false, code: "tool.not_found" })
+      end
+    rescue => e
+      resolver(dlg, data && data["id"], { ok: false, code: "tool.open_error", error: e.message })
+    end
+
     # ══════════════ I18N ══════════════
     dlg.add_action_callback("i18n_get") do |_ctx, json|
       data = parse_payload(json)
@@ -1604,27 +1624,35 @@ module SignEng
     cmd = UI::Command.new("SignEng") { SignEng.abrir }
     cmd.tooltip         = "SignEng — Gerador de Fachadas ACM"
     cmd.status_bar_text = "Abre o plugin SignEng"
-    cmd.small_icon      = File.join(ICONS_DIR, 'icon_24.svg')
-    cmd.large_icon      = File.join(ICONS_DIR, 'icon_32.svg')
+    cmd.small_icon      = File.join(ICONS_DIR, 'icon_24.png')
+    cmd.large_icon      = File.join(ICONS_DIR, 'icon_32.png')
     toolbar.add_item(cmd)
 
     # ── Botões por módulo (abrem o painel já no módulo — padrão do app) ──
     modulos_toolbar = [
-      ['auto_acm',       'Auto-ACM',        'Gera fachada em ACM com estrutura de metalon a partir de uma face'],
-      ['auto_acm_curvo', 'Auto-ACM Curvo',  'Fachadas ACM curvas/calandradas com estrutura'],
-      ['auto_sigame',    'Auto Sigam-me',   'Faixa contínua de ACM seguindo um caminho desenhado'],
-      ['textura_sync',   'Textura Sync',    'Aplica uma textura contínua atravessando várias faces'],
-      ['logo3d',         'Logo 3D',         'Importa DXF/DWG/SVG e extruda como logo 3D'],
-      ['planifica',      'Planifica',       'Planifica painéis capturados e exporta o plano de corte'],
-      ['corte_encaixe',  'Corte & Encaixe', 'Encaixes dente-a-dente e nesting com export SVG/DXF']
+      ['auto_acm', 'Estrutura ACM', 'Gera fachada ACM completa a partir de uma caixa selecionada', 'auto_acm'],
+      ['auto_acm_curvo', 'Fachada Curva', 'Cria estrutura facetada para superfícies curvas', 'auto_acm_curvo'],
+      ['auto_sigame', 'Faixa no Caminho', 'Gera ACM seguindo uma linha desenhada', 'auto_sigame'],
+      ['textura_sync', 'Textura Contínua', 'Alinha uma imagem em várias faces', 'textura_sync'],
+      ['logo3d', 'Logo em 3D', 'Extruda DXF, DWG ou SVG', 'logo3d'],
+      ['planifica', 'Plano de Corte', 'Organiza painéis para fabricação', 'planifica'],
+      ['corte_encaixe', 'Encaixes CNC', 'Cria juntas dente-a-dente e exporta vetores', 'corte_encaixe'],
+      ['alinhar', 'Alinhamento', 'Alinha objetos por borda, centro ou face', 'alinhar'],
+      ['luminoso', 'Caixa Luminosa', 'Gera luminosos paramétricos', 'luminoso'],
+      ['letra3d', 'Letras em 3D', 'Cria letras caixa a partir de vetores', 'letra3d'],
+      ['desenho_geometrico', 'Mosaico Geométrico', 'Transforma imagem em painel low-poly', 'desenho_geometrico'],
+      ['movel_parametrico', 'Móvel Fatiado', 'Divide sólidos em painéis e fixadores', 'movel_parametrico']
     ]
-    modulos_toolbar.each do |mid, nome, desc|
-      c = UI::Command.new("SignEng — #{nome}") { SignEng.abrir_modulo(mid) }
-      c.tooltip         = "#{nome} — #{desc}"
+    ferramentas_diretas = %w[alinhar luminoso letra3d desenho_geometrico movel_parametrico]
+    modulos_toolbar.each_with_index do |(mid, nome, desc, icon), index|
+      action = ferramentas_diretas.include?(mid) ? -> { SignEng::Generator.const_get({ 'alinhar' => 'Alinhar', 'luminoso' => 'Luminoso', 'letra3d' => 'Letra3d', 'desenho_geometrico' => 'GeoArt', 'movel_parametrico' => 'MovelParametrico' }[mid]).ativar } : -> { SignEng.abrir_modulo(mid) }
+      c = UI::Command.new("SignEng — #{nome}") { action.call }
+      c.tooltip         = "#{nome} — #{desc} | Atalho sugerido: Ctrl+Alt+#{index + 1}"
       c.status_bar_text = desc
-      c.small_icon      = File.join(ICONS_DIR, "#{mid}_24.svg")
-      c.large_icon      = File.join(ICONS_DIR, "#{mid}_32.svg")
+      c.small_icon      = File.join(ICONS_DIR, "#{icon}_24.svg")
+      c.large_icon      = File.join(ICONS_DIR, "#{icon}_32.svg")
       toolbar.add_item(c)
+      menu.add_item(c)
     end
 
     cmd_alinhar = UI::Command.new("SignEng — Alinhar") { SignEng::Generator::Alinhar.ativar }
@@ -1640,26 +1668,6 @@ module SignEng
     cmd_luminoso.small_icon      = File.join(ICONS_DIR, 'luminoso_24.svg')
     cmd_luminoso.large_icon      = File.join(ICONS_DIR, 'luminoso_32.svg')
     toolbar.add_item(cmd_luminoso)
-
-    # LETRA 3D — módulo PAUSADO: botão oculto
-    # da toolbar até retomarmos. Pra reativar, descomentar o bloco abaixo.
-    # Estado da depuração: docs/SESSION_LOG.md (v1.8.78→v1.8.80).
-    # cmd_letra3d = UI::Command.new("SignEng — Letra 3D") { SignEng::Generator::Letra3d.ativar }
-    # cmd_letra3d.tooltip         = "Letra 3D — letras caixa pra impressão 3D a partir de SVG"
-    # cmd_letra3d.status_bar_text = "Gera letras caixa pra impressão 3D (casca, suporte, fundo e acrílico)"
-    # cmd_letra3d.small_icon      = File.join(ICONS_DIR, 'letra3d_24.svg')
-    # cmd_letra3d.large_icon      = File.join(ICONS_DIR, 'letra3d_32.svg')
-    # toolbar.add_item(cmd_letra3d)
-
-    # DESENHO GEOMÉTRICO — Fase 1, OCULTO na release pública (2026-07-24,
-    # sai da toolbar até o lançamento oficial.
-    # Pra reativar (teste interno), descomentar o bloco abaixo.
-    # cmd_geoart = UI::Command.new("SignEng — Desenho Geométrico") { SignEng::Generator::GeoArt.ativar }
-    # cmd_geoart.tooltip         = "Desenho Geométrico — foto vira mosaico low-poly em ACM"
-    # cmd_geoart.status_bar_text = "Transforma uma foto em quadro geométrico (mosaico de triângulos em ACM)"
-    # cmd_geoart.small_icon      = File.join(ICONS_DIR, 'desenho_geometrico_24.svg')
-    # cmd_geoart.large_icon      = File.join(ICONS_DIR, 'desenho_geometrico_32.svg')
-    # toolbar.add_item(cmd_geoart)
 
     cmd_movelparam = UI::Command.new("SignEng — Móvel Paramétrico") { SignEng::Generator::MovelParametrico.ativar }
     cmd_movelparam.tooltip         = "Móvel Paramétrico — fatia um sólido em chapas paralelas com fixação"

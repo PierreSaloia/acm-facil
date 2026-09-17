@@ -85,21 +85,7 @@
         <header class="topbar">
           <div class="topbar__brand">
             <div class="topbar__logo-mark">
-              <svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="seLogoGrad" x1="4" y1="36" x2="36" y2="4" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%"  stop-color="#0b1f3a"/>
-                    <stop offset="50%" stop-color="#0e7490"/>
-                    <stop offset="100%" stop-color="#22d3ee"/>
-                  </linearGradient>
-                  <linearGradient id="seLogoAccent" x1="24" y1="14" x2="36" y2="2" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%"  stop-color="#38bdf8"/>
-                    <stop offset="100%" stop-color="#a5f3fc"/>
-                  </linearGradient>
-                </defs>
-                <path d="M20,6 A7,7 0 0 1 20,20 A7,7 0 0 0 20,34" fill="none" stroke="url(#seLogoGrad)" stroke-width="8" stroke-linecap="round"/>
-                <polygon points="36,3 25,3 36,14" fill="url(#seLogoAccent)"/>
-              </svg>
+              <img src="assets/images/logo-principal.png" alt="SignEng" width="40" height="40">
             </div>
             <span class="topbar__name">SignEng</span>
           </div>
@@ -128,6 +114,11 @@
               </h2>
               <p class="section-header__subtitle" data-i18n="dash.subtitle">Escolha um gerador para começar.</p>
             </div>
+          </div>
+
+          <div class="module-toolbar">
+            <label class="module-search"><span class="sr-only">Pesquisar módulos</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="dash_search" type="search" placeholder="Pesquisar por módulo ou tarefa" oninput="Dashboard.filterModules()"></label>
+            <span class="module-toolbar__hint">Todos os módulos disponíveis</span>
           </div>
 
           <div id="dash_license_banner" hidden>
