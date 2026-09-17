@@ -29,7 +29,9 @@ module SignEng
       # Essas chaves NÃO são secretas. O que protege o sistema são as
       # security rules do Firestore + domain allowlist do Auth.
       API_KEY    = "AIzaSyB58yYBeY7WMaQuFzIOe2GBZO_cZiue7vQ".freeze
-      PROJECT_ID = "signeng-d876c".freeze
+      # O projeto foi renomeado visualmente para SignEng, mas as Cloud
+      # Functions antigas continuam publicadas no projeto Firebase original.
+      PROJECT_ID = "acmfacil-d876c".freeze
 
       AUTH_BASE = "https://identitytoolkit.googleapis.com/v1".freeze
       FS_BASE   = "https://firestore.googleapis.com/v1/projects/#{PROJECT_ID}/databases/(default)/documents".freeze

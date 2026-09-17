@@ -70,17 +70,16 @@ module SignEng
         return { ok: false, code: "auth.empty_email" }    if email.empty?
         return { ok: false, code: "auth.empty_password" } if pwd.empty?
 
-        res = SupabaseClient.sign_in(email, pwd)
-        if res[:ok]
-          save_supabase_tokens(res)
-          firebase_res = FirebaseClient.sign_in(email, pwd)
-          save_tokens(firebase_res) if firebase_res[:ok]
-          user = build_supabase_user(res[:user], email)
-          return { ok: true, user: user, license: license_for_user(user) }
-        end
-
-        # Compatibilidade temporária com contas ainda existentes no Firebase.
+        # Firebase Auth continua sendo a autenticação principal porque as
+        # Cloud Functions legadas validam Firebase ID tokens.
         res = FirebaseClient.sign_in(email, pwd)
+
+        if res[:ok]
+          save_tokens(res)
+          # Sincroniza o perfil Supabase quando a mesma conta já existir lá.
+          supabase_res = SupabaseClient.sign_in(email, pwd)
+          save_supabase_tokens(supabase_res) if supabase_res[:ok]
+        end
 
         if !res[:ok]
           # Firebase offline? Fallback pro master

@@ -2,7 +2,9 @@
 
 ## Funcoes usadas pelo SignEng
 
-O cliente Ruby chama estas funcoes no projeto Firebase `signeng-d876c`:
+O cliente Ruby chama estas funcoes no projeto Firebase original `acmfacil-d876c`.
+O nome visual do plugin mudou para SignEng, mas nao se deve renomear o projeto
+Firebase enquanto as funcoes antigas estiverem em uso.
 
 - `autoAcmCompute`
 - `autoAcmCurvoCompute`
@@ -21,12 +23,13 @@ O cliente Ruby chama estas funcoes no projeto Firebase `signeng-d876c`:
 A URL usada pelo plugin e:
 
 ```text
-https://us-central1-signeng-d876c.cloudfunctions.net/NOME_DA_FUNCAO
+https://us-central1-acmfacil-d876c.cloudfunctions.net/NOME_DA_FUNCAO
 ```
 
 ## O que ja esta conectado
 
-- Login novo: Supabase Auth.
+- Login principal: Firebase Auth, porque as funcoes exigem Firebase ID token.
+- Perfil complementar: Supabase Auth/tabelas quando a mesma conta existir nos dois projetos.
 - Perfil e licenca: tabelas `users` e `licenses` do Supabase.
 - Compatibilidade legada: depois do login Supabase, o plugin tenta obter tambem um Firebase ID token com as mesmas credenciais.
 - Calculo legado: continua usando `FirebaseClient.call_function` quando existe Firebase ID token.
