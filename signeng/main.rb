@@ -15,12 +15,10 @@ module SignEng
   ICONS_DIR  = File.join(PLUGIN_DIR, 'resources', 'toolbar_icons')
   DEFAULT_NS = "SignEng".freeze
 
-  # ── Core: versão, firebase client, auth, cores e geometria compartilhadas ──
+  # ── Core: versão, cliente Supabase, auth, cores e geometria compartilhadas ──
   # Sketchup::require (não `require`): carrega tanto .rb (dev) quanto .rbe
   # (build assinado/criptografado pela Trimble). NÃO trocar de volta.
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'version')
-  Sketchup::require File.join(PLUGIN_DIR, 'core', 'firebase_config')
-  Sketchup::require File.join(PLUGIN_DIR, 'core', 'firebase_client')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'supabase_client')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'auth')
   Sketchup::require File.join(PLUGIN_DIR, 'core', 'cores')
@@ -97,7 +95,7 @@ module SignEng
   # ─────────────────────────────────────────────────────────────────────────
   def self.registrar_callbacks(dlg)
 
-    # ══════════════ AUTH (Firebase) ══════════════
+    # ══════════════ AUTH (Supabase) ══════════════
     dlg.add_action_callback("auth_login") do |_ctx, json|
       begin
         data = parse_payload(json)
@@ -147,7 +145,7 @@ module SignEng
       resolver(dlg, data["id"], { ok: true })
     end
 
-    # Recuperar senha agora manda email real via Firebase
+    # Recuperar senha agora manda email real via Supabase
     dlg.add_action_callback("auth_recuperar") do |_ctx, json|
       data  = parse_payload(json)
       email = data["email"].to_s.strip.downcase
@@ -374,17 +372,11 @@ module SignEng
     dlg.add_action_callback("app_check_update") do |_ctx, json|
       data = parse_payload(json)
       begin
-        # Query /plugin_versions where isLatest == true
-        id_token = Sketchup.read_default(DEFAULT_NS, "fb_id_token", "").to_s
-        # Fallback: se não tá logado, ainda tenta (query pública — rule permite read)
-        # Mas Firestore REST exige algum Authorization. Usa o id_token se houver.
-        r = Core::FirebaseClient.query_collection(
-          "plugin_versions",
-          where: { isLatest: true },
-          id_token: id_token
-        )
+        # public.plugin_versions permite select público (anon) onde
+        # is_latest=true — não exige sessão logada.
+        r = Core::SupabaseClient.select("plugin_versions", { is_latest: "eq.true" }, nil)
 
-        if !r[:ok] || !r[:docs] || r[:docs].empty?
+        if !r[:ok] || !r[:rows] || r[:rows].empty?
           # Sem resposta → assume uptodate
           resolver(dlg, data["id"], {
             ok:      true,
@@ -396,9 +388,9 @@ module SignEng
           next
         end
 
-        latest      = r[:docs].first
+        latest      = r[:rows].first
         remote_ver  = latest["version"].to_s
-        download    = latest["downloadUrl"].to_s
+        download    = latest["download_url"].to_s
         changelog   = latest["changelog"].to_s
         has_update  = !remote_ver.empty? && remote_ver != Core::VERSION
 
@@ -1446,26 +1438,8 @@ module SignEng
       menu.add_item(c)
     end
 
-    cmd_alinhar = UI::Command.new("SignEng — Alinhar") { SignEng::Generator::Alinhar.ativar }
-    cmd_alinhar.tooltip         = "Alinhar — objeto 2 alinha ao objeto 1 (fixo)"
-    cmd_alinhar.status_bar_text = "Alinha um grupo/componente a outro por borda, centro e faceamento"
-    cmd_alinhar.small_icon      = File.join(ICONS_DIR, 'alinhar_24.svg')
-    cmd_alinhar.large_icon      = File.join(ICONS_DIR, 'alinhar_32.svg')
-    toolbar.add_item(cmd_alinhar)
-
-    cmd_luminoso = UI::Command.new("SignEng — Luminoso") { SignEng::Generator::Luminoso.ativar }
-    cmd_luminoso.tooltip         = "Luminoso — gera luminoso em ACM (redondo/quadrado/retangular)"
-    cmd_luminoso.status_bar_text = "Gera luminoso paramétrico em ACM como componente editável"
-    cmd_luminoso.small_icon      = File.join(ICONS_DIR, 'luminoso_24.svg')
-    cmd_luminoso.large_icon      = File.join(ICONS_DIR, 'luminoso_32.svg')
-    toolbar.add_item(cmd_luminoso)
-
-    cmd_movelparam = UI::Command.new("SignEng — Móvel Paramétrico") { SignEng::Generator::MovelParametrico.ativar }
-    cmd_movelparam.tooltip         = "Móvel Paramétrico — fatia um sólido em chapas paralelas com fixação"
-    cmd_movelparam.status_bar_text = "Gera móvel/painel paramétrico fatiado a partir de um sólido selecionado"
-    cmd_movelparam.small_icon      = File.join(ICONS_DIR, 'movel_parametrico_24.svg')
-    cmd_movelparam.large_icon      = File.join(ICONS_DIR, 'movel_parametrico_32.svg')
-    toolbar.add_item(cmd_movelparam)
+    # (Alinhar, Luminoso e Móvel Paramétrico já foram adicionados pelo loop
+    # `modulos_toolbar` acima — não duplicar os botões aqui.)
 
     toolbar.show
 

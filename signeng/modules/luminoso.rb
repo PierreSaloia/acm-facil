@@ -972,30 +972,27 @@ module SignEng
       # Chama a function luminosoCompute (token + retry 1x, msgs padrão).
       def self.solicitar_luminoso_servidor(payload)
         ns = Core::Auth::DEFAULT_NS
-        id_token = Sketchup.read_default(ns, "fb_id_token", "").to_s
-        if Core::Auth::OFFLINE_MODE
-          return { ok: true, result: { "pts" => [] } }
-        end
-        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
+        access_token = Sketchup.read_default(ns, "sb_access_token", "").to_s
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if access_token.empty?
 
-        r = Core::FirebaseClient.call_function("luminosoCompute", payload, id_token)
-        if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
-          refresh = Sketchup.read_default(ns, "fb_refresh_token", "").to_s
+        r = Core::SupabaseClient.call_function("luminosoCompute", payload, access_token)
+        if !r[:ok] && r[:status].to_i == 401
+          refresh = Sketchup.read_default(ns, "sb_refresh_token", "").to_s
           unless refresh.empty?
-            ref = Core::FirebaseClient.refresh_id_token(refresh)
+            ref = Core::SupabaseClient.refresh_session(refresh)
             if ref[:ok]
-              id_token = ref[:id_token]
-              Sketchup.write_default(ns, "fb_id_token", id_token)
-              r = Core::FirebaseClient.call_function("luminosoCompute", payload, id_token)
+              access_token = ref[:access_token]
+              Core::Auth.save_tokens(ref)
+              r = Core::SupabaseClient.call_function("luminosoCompute", payload, access_token)
             end
           end
         end
 
         unless r[:ok]
-          msg = case r[:code].to_s
-                when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
-                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
+          msg = case r[:status].to_i
+                when 403 then "Acesso negado: #{r[:error]}"
+                when 401 then "Sessão expirada — faça login novamente no SignEng."
+                else r[:code].to_s == "function.not_found" ? r[:error] : "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

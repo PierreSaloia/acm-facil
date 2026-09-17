@@ -1336,38 +1336,35 @@ module SignEng
 
       # ======================================================================
       # SOLICITAR_PECAS_SERVIDOR — chama a function autoAcmCompute (Fase 3).
-      # Renova o id_token se expirado e tenta 1 vez de novo. Devolve
+      # Renova o access_token se expirado e tenta 1 vez de novo. Devolve
       # { ok: true, pecas: [...] } ou { ok: false, error: "msg pro usuário" }.
       # ======================================================================
       def self.solicitar_pecas_servidor(params, w_mm, d_mm, h_mm, rec_mm)
         ns = Core::Auth::DEFAULT_NS
-        id_token = Sketchup.read_default(ns, "fb_id_token", "").to_s
-        if Core::Auth::OFFLINE_MODE
-          return { ok: true, pecas: pecas_locais(params, w_mm, d_mm, h_mm) }
-        end
-        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
+        access_token = Sketchup.read_default(ns, "sb_access_token", "").to_s
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if access_token.empty?
 
         payload = { params: params, w: w_mm, d: d_mm, h: h_mm, recortes: rec_mm }
-        r = Core::FirebaseClient.call_function("autoAcmCompute", payload, id_token)
+        r = Core::SupabaseClient.call_function("autoAcmCompute", payload, access_token)
 
         # Token expirado → renova e tenta mais uma vez
-        if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
-          refresh = Sketchup.read_default(ns, "fb_refresh_token", "").to_s
+        if !r[:ok] && r[:status].to_i == 401
+          refresh = Sketchup.read_default(ns, "sb_refresh_token", "").to_s
           unless refresh.empty?
-            ref = Core::FirebaseClient.refresh_id_token(refresh)
+            ref = Core::SupabaseClient.refresh_session(refresh)
             if ref[:ok]
-              id_token = ref[:id_token]
-              Sketchup.write_default(ns, "fb_id_token", id_token)
-              r = Core::FirebaseClient.call_function("autoAcmCompute", payload, id_token)
+              access_token = ref[:access_token]
+              Core::Auth.save_tokens(ref)
+              r = Core::SupabaseClient.call_function("autoAcmCompute", payload, access_token)
             end
           end
         end
 
         unless r[:ok]
-          msg = case r[:code].to_s
-                when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
-                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
+          msg = case r[:status].to_i
+                when 403 then "Acesso negado: #{r[:error]}"
+                when 401 then "Sessão expirada — faça login novamente no SignEng."
+                else r[:code].to_s == "function.not_found" ? r[:error] : "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end
@@ -1378,8 +1375,10 @@ module SignEng
         { ok: true, pecas: pecas }
       end
 
-      # Calculador local usado quando o plugin está sem servidor. Mantém o
-      # renderizador único: a saída usa o mesmo formato da Cloud Function.
+      # SEM USO no momento — o sistema é somente online (ver Core::Auth).
+      # Mantida como referência: é o algoritmo que a futura Edge Function
+      # "autoAcmCompute" precisa reproduzir no servidor. Mesmo formato de
+      # saída usado por desenhar_pecas.
       def self.pecas_locais(params, w_mm, d_mm, h_mm)
         p = extrair(params.transform_keys(&:to_sym))
         roles = p[:roles]

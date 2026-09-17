@@ -6,7 +6,9 @@
 # com opção de contorno externo (tipo placa atrás do logo).
 #
 # ANTI-PIRATARIA (v1.9.8): os parsers de DXF/SVG rodam na function
-# logo3dCompute (Firebase), que valida licença + módulo antes de parsear.
+# logo3dCompute (Supabase Edge Function — pendente, ver
+# supabase/EDGE_FUNCTIONS_PENDING.md), que valida licença + módulo antes de
+# parsear.
 # O plugin envia o texto do arquivo e recebe paths 2D prontos. Sem
 # carregamento validado pelo servidor, o gerar não tem dados (SVG) nem
 # @current_path (todos os formatos).
@@ -120,32 +122,29 @@ module SignEng
       # ======================================================================
       def self.solicitar_parse_servidor(kind, content)
         ns = Core::Auth::DEFAULT_NS
-        id_token = Sketchup.read_default(ns, "fb_id_token", "").to_s
-        if Core::Auth::OFFLINE_MODE
-          return { ok: true, paths_2d: [], dims_mm: { "w" => 0, "h" => 0 }, subpaths: [] }
-        end
-        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
+        access_token = Sketchup.read_default(ns, "sb_access_token", "").to_s
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if access_token.empty?
 
         payload = { "kind" => kind, "content" => content }
 
-        r = Core::FirebaseClient.call_function("logo3dCompute", payload, id_token)
-        if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
-          refresh = Sketchup.read_default(ns, "fb_refresh_token", "").to_s
+        r = Core::SupabaseClient.call_function("logo3dCompute", payload, access_token)
+        if !r[:ok] && r[:status].to_i == 401
+          refresh = Sketchup.read_default(ns, "sb_refresh_token", "").to_s
           unless refresh.empty?
-            ref = Core::FirebaseClient.refresh_id_token(refresh)
+            ref = Core::SupabaseClient.refresh_session(refresh)
             if ref[:ok]
-              id_token = ref[:id_token]
-              Sketchup.write_default(ns, "fb_id_token", id_token)
-              r = Core::FirebaseClient.call_function("logo3dCompute", payload, id_token)
+              access_token = ref[:access_token]
+              Core::Auth.save_tokens(ref)
+              r = Core::SupabaseClient.call_function("logo3dCompute", payload, access_token)
             end
           end
         end
 
         unless r[:ok]
-          msg = case r[:code].to_s
-                when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
-                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
+          msg = case r[:status].to_i
+                when 403 then "Acesso negado: #{r[:error]}"
+                when 401 then "Sessão expirada — faça login novamente no SignEng."
+                else r[:code].to_s == "function.not_found" ? r[:error] : "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end

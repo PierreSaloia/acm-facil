@@ -20,7 +20,9 @@
 # FRENTE (profundidade) e pra CIMA (altura).
 #
 # v1.9.10 (anti-pirataria, FASE 3): o CÁLCULO roda na function
-# autoSigameCompute (Firebase), que valida licença + módulo antes de calcular.
+# autoSigameCompute (Supabase Edge Function — pendente, ver
+# supabase/EDGE_FUNCTIONS_PENDING.md), que valida licença + módulo antes de
+# calcular.
 # O plugin captura o caminho, envia (mm) e desenha as peças que voltam
 # (desenhar_pecas_sigame + beam). Port validado pelo harness: 215/215 peças
 # exatas contra o cálculo Ruby original. Mesmo padrão do Auto-ACM/Curvo/
@@ -255,11 +257,8 @@ module SignEng
       # ======================================================================
       def self.solicitar_pecas_servidor_sigame(pts, alt_mm, prof_mm, params)
         ns = Core::Auth::DEFAULT_NS
-        id_token = Sketchup.read_default(ns, "fb_id_token", "").to_s
-        if Core::Auth::OFFLINE_MODE
-          return { ok: true, pecas: pecas_locais_sigame(pts, alt_mm, prof_mm, params) }
-        end
-        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if id_token.empty?
+        access_token = Sketchup.read_default(ns, "sb_access_token", "").to_s
+        return { ok: false, error: "Sessão expirada — faça login novamente no SignEng." } if access_token.empty?
 
         payload = {
           "pts"     => pts.map { |p| [p.x / 1.mm, p.y / 1.mm, p.z / 1.mm] },
@@ -268,24 +267,24 @@ module SignEng
           "params"  => params
         }
 
-        r = Core::FirebaseClient.call_function("autoSigameCompute", payload, id_token)
-        if !r[:ok] && r[:code].to_s == "UNAUTHENTICATED"
-          refresh = Sketchup.read_default(ns, "fb_refresh_token", "").to_s
+        r = Core::SupabaseClient.call_function("autoSigameCompute", payload, access_token)
+        if !r[:ok] && r[:status].to_i == 401
+          refresh = Sketchup.read_default(ns, "sb_refresh_token", "").to_s
           unless refresh.empty?
-            ref = Core::FirebaseClient.refresh_id_token(refresh)
+            ref = Core::SupabaseClient.refresh_session(refresh)
             if ref[:ok]
-              id_token = ref[:id_token]
-              Sketchup.write_default(ns, "fb_id_token", id_token)
-              r = Core::FirebaseClient.call_function("autoSigameCompute", payload, id_token)
+              access_token = ref[:access_token]
+              Core::Auth.save_tokens(ref)
+              r = Core::SupabaseClient.call_function("autoSigameCompute", payload, access_token)
             end
           end
         end
 
         unless r[:ok]
-          msg = case r[:code].to_s
-                when "PERMISSION_DENIED" then "Acesso negado: #{r[:error]}"
-                when "UNAUTHENTICATED"   then "Sessão expirada — faça login novamente no SignEng."
-                else "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
+          msg = case r[:status].to_i
+                when 403 then "Acesso negado: #{r[:error]}"
+                when 401 then "Sessão expirada — faça login novamente no SignEng."
+                else r[:code].to_s == "function.not_found" ? r[:error] : "Sem conexão com o servidor SignEng (#{r[:error]}). Verifique sua internet e tente novamente."
                 end
           return { ok: false, error: msg }
         end
@@ -294,8 +293,10 @@ module SignEng
         { ok: true, pecas: res["pecas"] || [] }
       end
 
-      # Geometria local mínima e determinística para uso sem Firebase. As
-      # peças seguem o mesmo contrato consumido por converter/desenhar.
+      # SEM USO no momento — o sistema é somente online (ver Core::Auth).
+      # Mantida como referência: é o algoritmo que a futura Edge Function
+      # "autoSigameCompute" precisa reproduzir no servidor. Mesmo contrato
+      # consumido por converter/desenhar.
       def self.pecas_locais_sigame(pts, alt_mm, prof_mm, params)
         return [] if pts.length < 2
         altura = alt_mm.to_f

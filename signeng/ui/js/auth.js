@@ -95,9 +95,10 @@ const Auth = {
   async logout() {
     try { await Bridge.call('auth_logout'); } catch (e) {}
     Auth.state.user = null;
+    Auth.state.license = null;
     const pwd = document.getElementById('auth_pwd');
     if (pwd) pwd.value = '';
-    Router.goto('dashboard');
+    Router.goto('auth');
   },
 
   async recuperarSenha(event) {
