@@ -3,6 +3,10 @@
    ══════════════════════════════════════════════════════════════════════════
    Toda chamada de JS pra Ruby deve passar por Bridge.call(action, payload).
    Retorna Promise que resolve quando o Ruby chama Bridge._resolve(id, data).
+
+   Fora do SketchUp (preview no navegador via `node server.js`) não existe o
+   global `sketchup` — nesse caso Bridge.call cai pro mock HTTP em server.js.
+   O plugin real dentro do SketchUp nunca usa esse caminho.
    ══════════════════════════════════════════════════════════════════════════ */
 
 const Bridge = {
@@ -21,6 +25,11 @@ const Bridge = {
    * @returns {Promise<object>}
    */
   call(action, payload = {}, timeoutMs = 60000) {
+    // Fora do SketchUp (preview no navegador) — usa o mock HTTP.
+    if (typeof sketchup === 'undefined') {
+      return Bridge._callHttp(action, payload);
+    }
+
     return new Promise((resolve, reject) => {
       // Gera um id único pra essa chamada
       const id = 'b' + (++Bridge._lastId) + '_' + Date.now();
@@ -36,8 +45,7 @@ const Bridge = {
 
       const full = Object.assign({ id }, payload);
 
-      // sketchup global existe só dentro do HtmlDialog do SketchUp
-      if (typeof sketchup === 'undefined' || !sketchup[action]) {
+      if (!sketchup[action]) {
         clearTimeout(Bridge._callbacks[id].timer);
         delete Bridge._callbacks[id];
         reject(new Error('Callback Ruby não registrado: ' + action));
@@ -54,6 +62,28 @@ const Bridge = {
     });
   },
 
+  // Caminho usado só no preview via `node server.js` (sem SketchUp). Mantém
+  // o mesmo contrato de retorno do bridge real, incluindo o tratamento de
+  // `blocked` — server.js hoje é um mock e não gera geometria de verdade.
+  async _callHttp(action, payload) {
+    const res = await fetch(`/api/${action}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    Bridge._handleBlocked(data);
+    return data;
+  },
+
+  _handleBlocked(data) {
+    if (data && data.blocked === true &&
+        !(typeof Auth !== 'undefined' && Auth.state && Auth.state.user && Auth.state.user.local_id === 'offline-local-user') &&
+        typeof App !== 'undefined' && App.handleBlocked) {
+      try { App.handleBlocked(data); } catch (e) { console.warn('handleBlocked falhou:', e); }
+    }
+  },
+
   /**
    * Chamado pelo Ruby via dialog.execute_script("Bridge._resolve('abc', {...})").
    * Não usar direto no JS da UI — é interno do Bridge.
@@ -66,9 +96,7 @@ const Bridge = {
     // Intercepta respostas marcadas como bloqueadas pelo gate de licença
     // (assert_valid! no Ruby). Aciona o fluxo global de logout antes de
     // resolver a Promise, pra que o caller já receba o erro tratado.
-    if (data && data.blocked === true && !(typeof Auth !== 'undefined' && Auth.state && Auth.state.user && Auth.state.user.local_id === 'offline-local-user') && typeof App !== 'undefined' && App.handleBlocked) {
-      try { App.handleBlocked(data); } catch (e) { console.warn('handleBlocked falhou:', e); }
-    }
+    Bridge._handleBlocked(data);
     cb.resolve(data);
   },
 
