@@ -61,4 +61,4 @@ algoritmo, só o resultado. O cliente Ruby (`Core::SupabaseClient.call_function`
 já está pronto para chamar `https://mxtpmkverfvyucagckey.supabase.co/functions/v1/<nome>`,
 mas **nenhuma Edge Function foi implantada ainda**. Até lá, os botões
 "Gerar" retornam um erro explícito de função não encontrada. Ver
-`CLOUD_FUNCTIONS_MIGRATION.md` para a lista completa e o contrato de cada uma.
+`EDGE_FUNCTIONS_PENDING.md` para a lista completa e o contrato de cada uma.
